@@ -1,30 +1,47 @@
 import Container from "../ui/Container";
 import ProjectCard from "../projects/ProjectCard";
 import { Project } from "@/types/project";
+import { prisma } from "@/lib/prisma";
 
 
 async function getProjects(){
 
+  const projects = await prisma.project.findMany({
 
-const res = await fetch(
-"http://localhost:3000/api/projects",
-{
-cache:"no-store"
+    where:{
+      published:true
+    },
+
+    include:{
+      images:true,
+      technologies:{
+        include:{
+          technology:true
+        }
+      }
+
+    },
+
+    orderBy:{
+      displayOrder:"asc"
+    }
+
+  });
+
+
+  return projects;
+
 }
-);
 
-
-return res.json();
-
-
-}
 
 
 
 
 export default async function Projects(){
 
-const projects = await getProjects() as Project[];
+
+const projects = await getProjects() as unknown as Project[];
+
 
 
 
@@ -35,9 +52,7 @@ id="projects"
 
 className="
 bg-[#09090B]
-
 py-32
-
 text-white
 "
 >
@@ -56,11 +71,8 @@ max-w-3xl
 <p
 className="
 text-sm
-
 uppercase
-
 tracking-[0.3em]
-
 text-indigo-400
 "
 >
@@ -70,14 +82,13 @@ Projects
 </p>
 
 
+
+
 <h2
 className="
 mt-5
-
 text-4xl
-
 md:text-5xl
-
 font-bold
 "
 >
@@ -88,10 +99,11 @@ Featured Engineering Work
 
 
 
+
+
 <p
 className="
 mt-5
-
 text-zinc-400
 "
 >
@@ -103,8 +115,8 @@ and digital solutions.
 </p>
 
 
-
 </div>
+
 
 
 
@@ -114,13 +126,9 @@ and digital solutions.
 
 className="
 mt-16
-
 grid
-
 gap-8
-
 md:grid-cols-2
-
 "
 
 >
@@ -128,16 +136,20 @@ md:grid-cols-2
 
 {
 projects.map((project)=>(
-  <ProjectCard
-    key={project.id}
-    project={project}
-  />
+
+<ProjectCard
+
+key={project.id}
+
+project={project}
+
+/>
+
 ))
 }
 
 
 </div>
-
 
 
 </Container>
