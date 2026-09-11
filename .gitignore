@@ -121,7 +121,7 @@ Thumbs.db
 # PRISMA GENERATED
 # =================================
 
-app/generated/prisma
+
 
 AGENTS.md
-CLAUDE.md
+CLAUDE.md/app/generated/prisma
