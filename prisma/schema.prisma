@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =======================
+// USER ADMIN
+// =======================
+
+model User {
+  id String @id @default(cuid())
+
+  email String @unique
+
+  password String
+
+  role String @default("ADMIN")
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+// =======================
+// PROJECT
+// =======================
+
+model Project {
+  id String @id @default(cuid())
+
+  title String
+
+  slug String @unique
+
+  shortDescription String
+
+  fullDescription String
+
+  category String
+
+  projectType String
+
+  year Int
+
+  problem String?
+
+  solution String?
+
+  githubUrl String?
+
+  liveDemoUrl String?
+
+  featured Boolean @default(false)
+
+  published Boolean @default(false)
+
+  displayOrder Int @default(0)
+
+  images ProjectImage[]
+
+  technologies ProjectTechnology[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([published])
+  @@index([category])
+}
+
+// =======================
+// PROJECT IMAGE
+// =======================
+
+model ProjectImage {
+  id String @id @default(cuid())
+
+  projectId String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  imageUrl String
+
+  caption String?
+
+  imageType String @default("desktop")
+
+  isThumbnail Boolean @default(false)
+
+  displayOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+}
+
+// =======================
+// TECHNOLOGY
+// =======================
+
+model Technology {
+  id String @id @default(cuid())
+
+  name String
+
+  icon String?
+
+  category String
+
+  projects ProjectTechnology[]
+}
+
+// =======================
+// PROJECT TECHNOLOGY
+// =======================
+
+model ProjectTechnology {
+  projectId String
+
+  technologyId String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  technology Technology @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, technologyId])
+}
+
+// =======================
+// EXPERIENCE
+// =======================
+
+model Experience {
+  id String @id @default(cuid())
+
+  company String
+
+  position String
+
+  location String?
+
+  startDate String
+
+  endDate String?
+
+  description String
+
+  images ExperienceImage[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+// =======================
+// EXPERIENCE IMAGE
+// =======================
+
+model ExperienceImage {
+  id String @id @default(cuid())
+
+  url String
+
+  experienceId String
+
+  experience Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  displayOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+}
+
+// =======================
+// CERTIFICATE
+// =======================
+
+model Certificate {
+  id String @id @default(cuid())
+
+  title String
+
+  issuer String
+
+  year String
+
+  credentialUrl String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+// =======================
+// CONTACT MESSAGE
+// =======================
+
+model ContactMessage {
+  id String @id @default(cuid())
+
+  name String
+
+  email String
+
+  subject String
+
+  message String
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([isRead])
+}
