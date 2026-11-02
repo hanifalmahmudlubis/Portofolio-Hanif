@@ -1,85 +1,28 @@
-import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import ExperienceEditForm from "./ExperienceEditForm";
-
-export default async function EditExperiencePage({
-
-params
-
-}:{
-
-params:Promise<{
-id:string
-}>
-
-}){
-
-
-const {id}=await params;
-
-
-
-const experience =
-await prisma.experience.findUnique({
-
-where:{
-id
-}
-
-});
-
-
-
-if(!experience){
-
-notFound();
-
-}
-
-
-
-return (
-
-<div className="
-min-h-screen
-bg-black
-text-white
-p-8
-">
-
-
-<div className="
-max-w-4xl
-mx-auto
-">
-
-
-<h1 className="
-text-3xl
-font-bold
-mb-8
-">
-
-Edit Experience
-
-</h1>
-
-
-
-<ExperienceEditForm
-
-experience={experience}
-
-/>
-
-
-
-</div>
-
-
-</div>
-
-)
-
-
+import { requireAdminPage } from "@/lib/admin";
+import { prisma } from "@/lib/prisma";
+import ExperienceForm from "@/components/admin/ExperienceForm";
+import PageHeading from "@/components/admin/PageHeading";
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  await requireAdminPage();
+  const { id } = await params;
+  const item = await prisma.experience.findUnique({
+    where: { id },
+    include: { images: { orderBy: { displayOrder: "asc" } } },
+  });
+  if (!item) notFound();
+  return (
+    <>
+      <PageHeading
+        title="Edit pengalaman"
+        description="Perbarui informasi yang tampil di portofolio Anda."
+        back="/admin/experience"
+      />
+      <ExperienceForm experience={item} />
+    </>
+  );
 }

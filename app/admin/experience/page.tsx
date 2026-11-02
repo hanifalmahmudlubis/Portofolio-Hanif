@@ -1,235 +1,39 @@
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import DeleteButton from "./DeleteButton";
-
-
-export default async function ExperiencePage(){
-
-
-const experiences =
-await prisma.experience.findMany({
-
-orderBy:{
-createdAt:"desc"
-}
-
-});
-
-
-
-return (
-
-<div className="
-min-h-screen
-bg-black
-text-white
-p-8
-">
-
-
-<div className="
-max-w-5xl
-mx-auto
-">
-
-
-
-<div className="
-flex
-justify-between
-items-center
-mb-10
-">
-
-
-<div>
-
-<h1 className="
-text-3xl
-font-bold
-">
-
-Experience
-
-</h1>
-
-
-<p className="
-text-zinc-400
-mt-2
-">
-
-Manage your work experience
-
-</p>
-
-
-</div>
-
-
-
-<Link
-
-href="/admin/experience/new"
-
-className="
-bg-white
-text-black
-px-5
-py-3
-rounded-xl
-font-semibold
-"
-
->
-
-+ Add Experience
-
-</Link>
-
-
-</div>
-
-
-
-
-
-<div className="
-space-y-4
-">
-
-
-{
-experiences.map((item)=>(
-
-
-<div
-
-key={item.id}
-
-className="
-bg-zinc-900
-border
-border-white/10
-rounded-xl
-p-6
-"
-
->
-
-
-<div className="
-flex
-justify-between
-items-start
-">
-
-
-<div>
-
-
-<h2 className="
-text-xl
-font-semibold
-">
-
-{item.position}
-
-</h2>
-
-
-<p className="
-text-zinc-400
-">
-
-{item.company}
-
-</p>
-
-
-<p className="
-text-sm
-text-zinc-500
-mt-2
-">
-
-{item.startDate}
-{" - "}
-{item.endDate ?? "Present"}
-
-</p>
-
-
-</div>
-
-
-
-
-<Link
-
-href={`/admin/experience/${item.id}`}
-
-className="
-px-4
-py-2
-border
-border-white/10
-rounded-lg
-hover:bg-white
-hover:text-black
-transition
-"
-
->
-
-Edit
-
-<DeleteButton
-
-id={item.id}
-
-/>
-</Link>
-
-
-
-
-</div>
-
-
-
-
-
-<p className="
-text-zinc-300
-mt-5
-">
-
-{item.description}
-
-</p>
-
-
-
-</div>
-
-
-))
-
-}
-
-
-
-</div>
-
-
-
-</div>
-
-
-</div>
-
-
-)
-
+import { requireAdminPage } from "@/lib/admin";
+import { listExperiences } from "@/lib/services/portfolio";
+import { formatMonth } from "@/lib/site";
+import PageHeading from "@/components/admin/PageHeading";
+import ContentList from "@/components/admin/ContentList";
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string }>;
+}) {
+  await requireAdminPage();
+  const items = await listExperiences();
+  const saved = (await searchParams).saved === "1";
+  return (
+    <>
+      <PageHeading
+        title="Pengalaman"
+        description="Ceritakan perjalanan profesional, kontribusi, dan dokumentasi Anda."
+        action={{ href: "/admin/experience/new", label: "Tambah pengalaman" }}
+      />
+      {saved && (
+        <p role="status" className="notice mb-6">
+          Perubahan berhasil disimpan. Konten publik sudah diperbarui sesuai
+          status publikasi.
+        </p>
+      )}
+      <ContentList
+        kind="experience"
+        emptyLabel="Belum ada pengalaman. Tambahkan perjalanan profesional Anda."
+        items={items.map((item) => ({
+          id: item.id,
+          title: item.position,
+          subtitle: item.company,
+          meta: `${formatMonth(item.startDate)} — ${item.endDate ? formatMonth(item.endDate) : "Sekarang"}`,
+        }))}
+      />
+    </>
+  );
 }

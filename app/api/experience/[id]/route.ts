@@ -1,162 +1,34 @@
+import { requireAdmin } from "@/lib/admin";
+import { apiHandler, ApiError, readJson } from "@/lib/api/errors";
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
-
-
-
-export async function PUT(
-
-request:Request,
-
-context:{
-params:Promise<{
-id:string
-}>
-}
-
-){
-
-
-try{
-
-
-const {id}=await context.params;
-
-
-const body =
-await request.json();
-
-
-
-const experience =
-await prisma.experience.update({
-
-where:{
-id
-},
-
-
-data:{
-
-
-company:body.company,
-
-
-position:body.position,
-
-
-location:body.location || null,
-
-
-startDate:body.startDate,
-
-
-endDate:body.endDate || null,
-
-
-description:body.description
-
-
-}
-
-
-});
-
-
-
-return NextResponse.json(experience);
-
-
-
-}
-
-catch(error){
-
-
-console.log(error);
-
-
-return NextResponse.json(
-
-{
-message:"Update failed"
-},
-
-{
-status:500
-}
-
-);
-
-
-}
-
-}
-
-
-
-
-
-export async function DELETE(
-
-request:Request,
-
-context:{
-params:Promise<{
-id:string
-}>
-}
-
-){
-
-
-try{
-
-
-const {id}=await context.params;
-
-
-
-await prisma.experience.delete({
-
-where:{
-id
-}
-
-});
-
-
-
-return NextResponse.json({
-
-success:true
-
-});
-
-
-
-}
-
-catch(error){
-
-
-console.log(error);
-
-
-
-return NextResponse.json(
-
-{
-message:"Delete failed"
-},
-
-{
-status:500
-}
-
-);
-
-
-}
-
-
-}
+import { saveExperience } from "@/lib/services/portfolio";
+import { refreshPortfolio } from "@/lib/revalidate";
+type Context = { params: Promise<{ id: string }> };
+export const GET = (_request: Request, context: Context) =>
+  apiHandler(async () => {
+    const result = await prisma.experience.findUnique({
+      where: { id: (await context.params).id },
+      include: { images: { orderBy: { displayOrder: "asc" } } },
+    });
+    if (!result) throw new ApiError(404, "Pengalaman tidak ditemukan.");
+    return result;
+  });
+export const PUT = (request: Request, context: Context) =>
+  apiHandler(async () => {
+    await requireAdmin(request);
+    const result = await saveExperience(
+      await readJson(request),
+      (await context.params).id,
+    );
+    refreshPortfolio();
+    return result;
+  });
+export const DELETE = (request: Request, context: Context) =>
+  apiHandler(async () => {
+    await requireAdmin(request);
+    await prisma.experience.delete({
+      where: { id: (await context.params).id },
+    });
+    refreshPortfolio();
+    return { success: true };
+  });
