@@ -9,6 +9,8 @@ import {
   technologyInput,
 } from "../validation";
 import { removeUpload } from "../uploads";
+import { compareExperienceDates } from "../dates";
+import { getIntroImage } from "./profile";
 
 export const projectInclude = {
   images: {
@@ -28,6 +30,7 @@ export const listProjects = (admin = false) =>
     where: admin ? {} : { published: true },
     include: projectInclude,
     orderBy: [
+      { year: "desc" },
       { displayOrder: "asc" },
       { featured: "desc" },
       { createdAt: "desc" },
@@ -39,11 +42,13 @@ export const getPublicProject = cache((slug: string) =>
     include: projectInclude,
   }),
 );
-export const listExperiences = () =>
-  prisma.experience.findMany({
-    include: { images: { orderBy: { displayOrder: "asc" } } },
-    orderBy: { createdAt: "desc" },
-  });
+export const listExperiences = async () =>
+  (
+    await prisma.experience.findMany({
+      include: { images: { orderBy: { displayOrder: "asc" } } },
+      orderBy: { createdAt: "desc" },
+    })
+  ).sort(compareExperienceDates);
 export const listCertificates = () =>
   prisma.certificate.findMany({
     orderBy: [{ year: "desc" }, { createdAt: "desc" }],
@@ -53,10 +58,15 @@ export const listTechnologies = () =>
     orderBy: [{ category: "asc" }, { name: "asc" }],
   });
 export const getPortfolio = async () => {
-  const [projects, experiences, certificates, technologies] = await Promise.all(
-    [listProjects(), listExperiences(), listCertificates(), listTechnologies()],
-  );
-  return { projects, experiences, certificates, technologies };
+  const [projects, experiences, certificates, technologies, introImageUrl] =
+    await Promise.all([
+      listProjects(),
+      listExperiences(),
+      listCertificates(),
+      listTechnologies(),
+      getIntroImage(),
+    ]);
+  return { projects, experiences, certificates, technologies, introImageUrl };
 };
 export async function saveProject(body: Record<string, unknown>, id?: string) {
   const { technologyIds, ...data } = projectInput(body);
@@ -148,7 +158,7 @@ export async function getDashboard() {
     prisma.contactMessage.count({ where: { isRead: false } }),
     prisma.project.findMany({
       take: 5,
-      orderBy: { updatedAt: "desc" },
+      orderBy: [{ year: "desc" }, { createdAt: "desc" }],
       include: projectInclude,
     }),
   ]);

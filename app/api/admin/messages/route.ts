@@ -5,6 +5,6 @@ export const GET = (request: Request) =>
   apiHandler(async () => {
     await requireAdmin(request);
     return prisma.contactMessage.findMany({
-      orderBy: [{ isRead: "asc" }, { createdAt: "desc" }],
+      orderBy: { createdAt: "desc" },
     });
   });

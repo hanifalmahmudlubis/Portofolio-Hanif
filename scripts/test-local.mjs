@@ -103,9 +103,14 @@ try {
     DATABASE_URL: `postgresql://portfolio_test@127.0.0.1:${pgPort}/postgres`,
     NEXTAUTH_URL: baseUrl,
     NEXTAUTH_SECRET: randomBytes(32).toString("hex"),
+    BLOB_READ_WRITE_TOKEN: "",
+    BLOB_STORE_ID: "",
+    VERCEL: "",
     TEST_BASE_URL: baseUrl,
     TEST_ADMIN_EMAIL: "admin@portfolio.test",
     TEST_ADMIN_PASSWORD: randomBytes(24).toString("hex"),
+    TEST_PROFILE_ADMIN_EMAIL: "profile-admin@portfolio.test",
+    TEST_PROFILE_ADMIN_PASSWORD: randomBytes(24).toString("hex"),
     TEST_VIEWER_EMAIL: "viewer@portfolio.test",
     TEST_VIEWER_PASSWORD: randomBytes(24).toString("hex"),
   };
@@ -121,6 +126,13 @@ try {
     data: {
       email: env.TEST_ADMIN_EMAIL,
       password: await bcrypt.hash(env.TEST_ADMIN_PASSWORD, 10),
+      role: "ADMIN",
+    },
+  });
+  await db.user.create({
+    data: {
+      email: env.TEST_PROFILE_ADMIN_EMAIL,
+      password: await bcrypt.hash(env.TEST_PROFILE_ADMIN_PASSWORD, 10),
       role: "ADMIN",
     },
   });

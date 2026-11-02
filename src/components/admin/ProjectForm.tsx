@@ -374,6 +374,7 @@ export default function ProjectForm({
               />
               <Field
                 label="Urutan"
+                hint="Untuk proyek pada tahun yang sama"
                 name="displayOrder"
                 type="number"
                 min={0}

@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       // Keep existing database URLs working for legacy images shipped as assets.
       fallback: [
         { source: "/uploads/projects/:file", destination: "/portfolio/:file" },
+        { source: "/uploads/profile/:file", destination: "/portfolio/:file" },
       ],
     };
   },

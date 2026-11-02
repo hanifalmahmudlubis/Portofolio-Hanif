@@ -11,9 +11,11 @@ import {
   LogOut,
   ArrowUpRight,
   X,
+  UserRound,
 } from "lucide-react";
 const navigation = [
   { title: "Ringkasan", href: "/admin/dashboard", icon: LayoutDashboard },
+  { title: "Foto intro", href: "/admin/profile", icon: UserRound },
   { title: "Proyek", href: "/admin/projects", icon: FolderKanban },
   { title: "Pengalaman", href: "/admin/experience", icon: Briefcase },
   { title: "Sertifikat", href: "/admin/certificate", icon: Award },

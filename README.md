@@ -40,6 +40,9 @@ Rujukan: [Vercel server uploads](https://vercel.com/docs/vercel-blob/server-uplo
 
 ## Alur fitur
 
+- Proyek dan sertifikat diurutkan dari tahun terbaru. Pengalaman yang masih berjalan berada paling atas, diikuti tanggal selesai dan mulai terbaru; format lama seperti `Sep 2024` tetap diurutkan dengan benar. Daftar admin dan API menggunakan urutan yang sama.
+- Foto intro dapat diganti melalui **Admin → Foto intro** (`/admin/profile`), lengkap dengan pratinjau dan opsi menggunakan foto awal. Upload memakai Vercel Blob bila token tersedia, atau disk lokal saat development. Foto lama dibersihkan setelah penggantian jika tidak lagi dipakai oleh pengaturan, proyek, atau pengalaman.
+- Header menandai bagian yang sedang terlihat saat scroll, termasuk tautan langsung ke section dan menu mobile. Halaman daftar/detail proyek menandai menu Projects.
 - Simpan proyek sebagai draft atau publikasikan ke situs. Draft tidak dikirim oleh API publik dan tidak bisa dibuka melalui slug publik.
 - Teknologi dipilih dari daftar bersama; teknologi baru dapat ditambahkan langsung dari editor proyek.
 - Gambar dapat dipilih hingga 8 sekaligus (maksimal 4 MB/gambar), dijadikan sampul, dilihat di galeri, dan dihapus. Slider berganti otomatis setiap 5 detik, dengan tombol jeda, thumbnail, swipe, dan tampilan penuh. Pergantian dijeda saat hover, fokus keyboard, membuka tampilan penuh, atau tab tidak aktif; reduced motion menonaktifkan autoplay secara default. Penghapusan proyek juga membersihkan gambar serta relasi teknologinya.
@@ -76,22 +79,23 @@ Keberhasilan mengembalikan objek/array JSON; create menggunakan status `201`. Er
 
 Status utama: `400` validasi, `401` sesi admin tidak valid, `403` origin tidak diizinkan, `404` data tidak ditemukan, `409` slug duplikat, `413` payload terlalu besar, `415` content type salah, `429` pembatasan request, `503` layanan data tidak tersedia.
 
-| Endpoint                   | Metode                | Akses / fungsi                                              |
-| -------------------------- | --------------------- | ----------------------------------------------------------- |
-| `/api/portfolio`           | GET                   | Publik: proyek published, pengalaman, sertifikat, teknologi |
-| `/api/projects`            | GET / POST            | Daftar publik / buat proyek sebagai admin                   |
-| `/api/projects/:id`        | GET / PUT / DELETE    | Baca proyek published / ubah dan hapus sebagai admin        |
-| `/api/admin/projects`      | GET                   | Admin: semua proyek termasuk draft                          |
-| `/api/projects/:id/images` | POST / PATCH / DELETE | Admin: upload, sampul, hapus gambar                         |
-| `/api/experience`          | GET / POST            | Publik: daftar / admin: buat                                |
-| `/api/experience/:id`      | GET / PUT / DELETE    | Publik: baca / admin: ubah, hapus                           |
-| `/api/certificate`         | GET / POST            | Publik: daftar / admin: buat                                |
-| `/api/certificate/:id`     | GET / PUT / DELETE    | Publik: baca / admin: ubah, hapus                           |
-| `/api/technologies`        | GET / POST            | Publik: daftar / admin: tambah                              |
-| `/api/contact`             | POST                  | Publik: kirim pesan dengan validasi dan pembatasan request  |
-| `/api/admin/messages`      | GET                   | Admin: kotak masuk                                          |
-| `/api/admin/messages/:id`  | PATCH / DELETE        | Admin: ubah isRead / hapus                                  |
-| `/api/admin/dashboard`     | GET                   | Admin: statistik dan proyek terbaru                         |
+| Endpoint                   | Metode                | Akses / fungsi                                                         |
+| -------------------------- | --------------------- | ---------------------------------------------------------------------- |
+| `/api/portfolio`           | GET                   | Publik: proyek published, pengalaman, sertifikat, teknologi            |
+| `/api/projects`            | GET / POST            | Daftar publik / buat proyek sebagai admin                              |
+| `/api/projects/:id`        | GET / PUT / DELETE    | Baca proyek published / ubah dan hapus sebagai admin                   |
+| `/api/admin/projects`      | GET                   | Admin: semua proyek termasuk draft                                     |
+| `/api/projects/:id/images` | POST / PATCH / DELETE | Admin: upload, sampul, hapus gambar                                    |
+| `/api/experience`          | GET / POST            | Publik: daftar / admin: buat                                           |
+| `/api/experience/:id`      | GET / PUT / DELETE    | Publik: baca / admin: ubah, hapus                                      |
+| `/api/certificate`         | GET / POST            | Publik: daftar / admin: buat                                           |
+| `/api/certificate/:id`     | GET / PUT / DELETE    | Publik: baca / admin: ubah, hapus                                      |
+| `/api/technologies`        | GET / POST            | Publik: daftar / admin: tambah                                         |
+| `/api/contact`             | POST                  | Publik: kirim pesan dengan validasi dan pembatasan request             |
+| `/api/admin/messages`      | GET                   | Admin: kotak masuk                                                     |
+| `/api/admin/messages/:id`  | PATCH / DELETE        | Admin: ubah isRead / hapus                                             |
+| `/api/admin/dashboard`     | GET                   | Admin: statistik dan proyek terbaru                                    |
+| `/api/admin/profile`       | GET / POST / DELETE   | Admin: foto intro saat ini / upload satu gambar / kembali ke foto awal |
 
 Contoh membaca data dari browser:
 
@@ -124,11 +128,11 @@ Tes mencakup validasi input, login/logout, penolakan akses anonim/non-admin, dra
 
 ## Catatan operasional
 
-- Dengan `BLOB_READ_WRITE_TOKEN`, gambar disimpan dan dihapus melalui Vercel Blob. Tanpa token, server lokal memakai `public/uploads/projects`; mode disk lokal tidak diizinkan untuk upload di Vercel. Cadangkan folder upload lokal bersama database jika memakai host Node dengan disk persisten.
+- Dengan `BLOB_READ_WRITE_TOKEN`, gambar disimpan dan dihapus melalui Vercel Blob. Tanpa token, server lokal memakai `public/uploads/projects` dan `public/uploads/profile`; mode disk lokal tidak diizinkan untuk upload di Vercel. Cadangkan folder upload lokal bersama database jika memakai host Node dengan disk persisten.
 - Rate limiter saat ini berada di memori satu proses. Gunakan shared store seperti Redis jika menjalankan banyak instance.
 - Cadangkan PostgreSQL dan folder upload bersama. Jangan menjalankan seed lama yang menghapus database.
 - Build menjalankan pemeriksaan TypeScript; opsi lama `ignoreBuildErrors` sudah dihapus.
-- Tidak diperlukan migrasi schema baru untuk perbaikan ini. Data dan URL route lama tetap digunakan.
+- Migrasi `20261102090000_add_site_settings` menambahkan tabel pengaturan foto intro. Jalankan `npm run db:migrate` sebelum deploy revisi ini; migrasi tidak menghapus konten yang ada. Tanpa foto kustom, intro menggunakan `/profile.jpg`.
 
 ## Status audit dependency
 

@@ -17,6 +17,12 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+model SiteSettings {
+  id            String   @id
+  introImageUrl String?
+  updatedAt     DateTime @default(now()) @updatedAt
+}
+
 model Project {
   id               String              @id @default(cuid())
   title            String

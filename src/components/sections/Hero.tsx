@@ -2,8 +2,12 @@ import Image from "next/image";
 import { ArrowUpRight, Github, Linkedin } from "lucide-react";
 import Container from "../ui/Container";
 import Reveal from "../ui/Reveal";
-import { site } from "@/lib/site";
-export default function Hero() {
+import { DEFAULT_INTRO_IMAGE, site } from "@/lib/site";
+export default function Hero({
+  photoUrl = DEFAULT_INTRO_IMAGE,
+}: {
+  photoUrl?: string;
+}) {
   return (
     <section id="intro" className="hero-section">
       <Container>
@@ -51,7 +55,7 @@ export default function Hero() {
           <Reveal delay={0.12} className="hero-photo-wrap">
             <div className="hero-portrait">
               <Image
-                src="/profile.jpg"
+                src={photoUrl}
                 alt="Hanif Al Mahmud Lubis"
                 fill
                 priority

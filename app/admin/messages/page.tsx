@@ -5,7 +5,7 @@ import PageHeading from "@/components/admin/PageHeading";
 export default async function Page() {
   await requireAdminPage();
   const messages = await prisma.contactMessage.findMany({
-    orderBy: [{ isRead: "asc" }, { createdAt: "desc" }],
+    orderBy: { createdAt: "desc" },
   });
   return (
     <>

@@ -195,14 +195,39 @@ img {
     background: #10192c99;
   }
   .public-nav-link {
+    position: relative;
     font-size: 14px;
     color: #9aa8bf;
-    padding-block: 10px;
-    transition: color 0.2s;
+    padding: 10px 8px;
+    border-radius: 6px;
+    transition:
+      color 0.2s,
+      background 0.2s;
+  }
+  .public-nav-link::after {
+    content: "";
+    position: absolute;
+    height: 2px;
+    bottom: 4px;
+    left: 8px;
+    right: 8px;
+    border-radius: 2px;
+    background: #91a6df;
+    transform: scaleX(0);
+    transition: transform 0.2s;
   }
   .public-nav-link:hover,
   .public-nav-link[aria-current] {
-    color: #97b5ff;
+    color: #d0def8;
+    background: #17294b70;
+  }
+  .public-nav-link:hover::after,
+  .public-nav-link[aria-current]::after {
+    transform: scaleX(1);
+  }
+  #mobile-navigation .public-nav-link::after {
+    width: 28px;
+    right: auto;
   }
   .hero-section {
     padding-block: 104px 112px;

@@ -10,7 +10,8 @@ import {
   MAX_UPLOAD_COUNT,
 } from "./upload-config";
 
-const uploadRoot = path.resolve(process.cwd(), "public", "uploads", "projects");
+const uploadRoot = path.resolve(process.cwd(), "public", "uploads");
+type Collection = "projects" | "profile";
 function imageExtension(buffer: Buffer) {
   if (
     buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
@@ -30,7 +31,10 @@ function imageExtension(buffer: Buffer) {
     "Gambar harus berupa PNG, JPEG, WebP, atau GIF yang valid.",
   );
 }
-export async function prepareImages(request: Request) {
+export async function prepareImages(
+  request: Request,
+  collection: Collection = "projects",
+) {
   const payload = await readBody(request, MAX_UPLOAD_BODY);
   let form: FormData;
   try {
@@ -52,7 +56,12 @@ export async function prepareImages(request: Request) {
         );
       const buffer = Buffer.from(await file.arrayBuffer());
       const name = `${randomUUID()}.${imageExtension(buffer)}`;
-      return { buffer, name, url: `/uploads/projects/${name}` };
+      return {
+        buffer,
+        name,
+        collection,
+        url: `/uploads/${collection}/${name}`,
+      };
     }),
   );
 }
@@ -68,19 +77,25 @@ export async function persistImages(
   try {
     if (token) {
       for (const image of images) {
-        const blob = await put(`projects/${image.name}`, image.buffer, {
-          access: "public",
-          addRandomSuffix: false,
-          token,
-        });
+        const blob = await put(
+          `${image.collection}/${image.name}`,
+          image.buffer,
+          {
+            access: "public",
+            addRandomSuffix: false,
+            token,
+          },
+        );
         image.url = blob.url;
       }
     } else {
-      await mkdir(uploadRoot, { recursive: true });
-      for (const image of images)
-        await writeFile(path.join(uploadRoot, image.name), image.buffer, {
+      for (const image of images) {
+        const directory = path.join(uploadRoot, image.collection);
+        await mkdir(directory, { recursive: true });
+        await writeFile(path.join(directory, image.name), image.buffer, {
           flag: "wx",
         });
+      }
     }
   } catch (error) {
     await Promise.all(images.map((image) => removeUpload(image.url)));
@@ -92,7 +107,9 @@ export async function removeUpload(url: string) {
     const location = new URL(url);
     if (
       !location.hostname.endsWith(".public.blob.vercel-storage.com") ||
-      !/^\/projects\/[0-9a-f-]+\.(png|jpg|webp|gif)$/.test(location.pathname)
+      !/^\/(projects|profile)\/[0-9a-f-]+\.(png|jpg|webp|gif)$/.test(
+        location.pathname,
+      )
     )
       return;
     if (!process.env.BLOB_READ_WRITE_TOKEN) return;
@@ -105,10 +122,11 @@ export async function removeUpload(url: string) {
   }
   // Legacy static assets bundled with a deployment cannot be unlinked.
   if (process.env.VERCEL) return;
-  if (!url.startsWith("/uploads/projects/")) return;
-  const name = url.slice("/uploads/projects/".length);
-  const target = path.resolve(uploadRoot, name);
-  if (!name || path.dirname(target) !== uploadRoot) return;
+  const local = /^\/uploads\/(projects|profile)\/(.+)$/.exec(url);
+  if (!local) return;
+  const directory = path.join(uploadRoot, local[1]);
+  const target = path.resolve(directory, local[2]);
+  if (path.dirname(target) !== directory) return;
   try {
     await unlink(target);
   } catch (error) {

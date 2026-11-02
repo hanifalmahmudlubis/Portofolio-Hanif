@@ -1,4 +1,5 @@
 import { normalizeMonth } from "./dates";
+export const DEFAULT_INTRO_IMAGE = "/profile.jpg";
 export const site = {
   name: "Hanif Al Mahmud Lubis",
   email: "hanifmahmud2905@gmail.com",

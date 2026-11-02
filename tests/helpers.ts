@@ -1,26 +1,38 @@
 import { expect, type APIRequestContext, type Page } from "@playwright/test";
-export async function signInApi(request: APIRequestContext, viewer = false) {
+export async function signInApi(
+  request: APIRequestContext,
+  account: boolean | "profile" = false,
+) {
+  const prefix =
+    account === true
+      ? "TEST_VIEWER"
+      : account === "profile"
+        ? "TEST_PROFILE_ADMIN"
+        : "TEST_ADMIN";
   const csrf = await (await request.get("/api/auth/csrf")).json();
   const response = await request.post("/api/auth/callback/credentials", {
     form: {
       csrfToken: csrf.csrfToken,
-      email: process.env[viewer ? "TEST_VIEWER_EMAIL" : "TEST_ADMIN_EMAIL"]!,
-      password:
-        process.env[viewer ? "TEST_VIEWER_PASSWORD" : "TEST_ADMIN_PASSWORD"]!,
+      email: process.env[`${prefix}_EMAIL`]!,
+      password: process.env[`${prefix}_PASSWORD`]!,
       callbackUrl: `${process.env.TEST_BASE_URL}/admin/dashboard`,
       json: "true",
     },
   });
-  if (viewer) expect(response.status()).toBe(401);
+  if (account === true) expect(response.status()).toBe(401);
   else expect(response.ok()).toBeTruthy();
   return response;
 }
-export async function signInUi(page: Page) {
+export async function signInUi(
+  page: Page,
+  account: "admin" | "profile" = "admin",
+) {
+  const prefix = account === "profile" ? "TEST_PROFILE_ADMIN" : "TEST_ADMIN";
   await page.goto("/admin/login");
-  await page.getByLabel("Email admin").fill(process.env.TEST_ADMIN_EMAIL!);
+  await page.getByLabel("Email admin").fill(process.env[`${prefix}_EMAIL`]!);
   await page
     .getByLabel("Password", { exact: true })
-    .fill(process.env.TEST_ADMIN_PASSWORD!);
+    .fill(process.env[`${prefix}_PASSWORD`]!);
   await page.getByRole("button", { name: "Masuk" }).click();
   await expect(page).toHaveURL(/\/admin\/dashboard/);
 }

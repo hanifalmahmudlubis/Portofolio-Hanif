@@ -10,6 +10,7 @@ import { safeUrl, imageUrl } from "../src/lib/urls";
 import { ApiError, readJson } from "../src/lib/api/errors";
 import { prepareImages, persistImages } from "../src/lib/uploads";
 import { MAX_IMAGE_SIZE, MAX_UPLOAD_BODY } from "../src/lib/upload-config";
+import { compareExperienceDates } from "../src/lib/dates";
 const project = {
   title: "Project",
   slug: "my-project",
@@ -19,6 +20,20 @@ const project = {
   projectType: "Personal",
   year: 2026,
 };
+
+test("experience chronology handles legacy months, ongoing work and date ties", () => {
+  const periods = [
+    { id: "legacy", startDate: "Sep 2024", endDate: "Dec 2024" },
+    { id: "latest-end", startDate: "2025-02", endDate: "2026-02" },
+    { id: "ongoing-old", startDate: "2021-01", endDate: null },
+    { id: "ongoing-new", startDate: "2026-01", endDate: null },
+    { id: "same-end", startDate: "2024-01", endDate: "2026-02" },
+  ];
+  assert.deepEqual(
+    periods.sort(compareExperienceDates).map((period) => period.id),
+    ["ongoing-new", "ongoing-old", "latest-end", "same-end", "legacy"],
+  );
+});
 test("project validation normalizes input and preserves publication flags and technology relations", () => {
   const data = projectInput({
     ...project,

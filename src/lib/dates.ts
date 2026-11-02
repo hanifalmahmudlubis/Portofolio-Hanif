@@ -35,3 +35,18 @@ export function normalizeMonth(value: string): string | null {
   if (index < 0) return null;
   return normalizeMonth(`${legacy[2]}-${String(index + 1).padStart(2, "0")}`);
 }
+
+/** Ongoing work first, then latest end month and latest start month. */
+export function compareExperienceDates(
+  first: { startDate: string; endDate: string | null },
+  second: { startDate: string; endDate: string | null },
+) {
+  const end = (value: string | null) =>
+    value === null ? "9999-12" : normalizeMonth(value) || "";
+  return (
+    end(second.endDate).localeCompare(end(first.endDate)) ||
+    (normalizeMonth(second.startDate) || "").localeCompare(
+      normalizeMonth(first.startDate) || "",
+    )
+  );
+}

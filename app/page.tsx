@@ -14,7 +14,7 @@ export default async function Home() {
     <>
       <Header />
       <main id="main">
-        <Hero />
+        <Hero photoUrl={data.introImageUrl} />
         <Projects projects={data.projects} />
         <Experience experiences={data.experiences} />
         <Skills technologies={data.technologies} />

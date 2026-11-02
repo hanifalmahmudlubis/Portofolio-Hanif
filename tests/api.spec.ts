@@ -15,6 +15,7 @@ test("public API hides drafts; every administrative read and write is protected"
   for (const url of [
     "/api/admin/projects",
     "/api/admin/dashboard",
+    "/api/admin/profile",
     "/api/admin/messages",
   ])
     expect((await request.get(url)).status()).toBe(401);
@@ -23,6 +24,7 @@ test("public API hides drafts; every administrative read and write is protected"
     "/api/experience",
     "/api/certificate",
     "/api/technologies",
+    "/api/admin/profile",
   ])
     expect((await request.post(url, { data: {} })).status()).toBe(401);
   for (const url of [
@@ -31,6 +33,7 @@ test("public API hides drafts; every administrative read and write is protected"
     "/api/certificate/missing",
     "/api/admin/messages/missing",
     "/api/projects/missing/images?imageId=missing",
+    "/api/admin/profile",
   ])
     expect((await request.delete(url)).status()).toBe(401);
   expect(
@@ -54,6 +57,7 @@ test("public API hides drafts; every administrative read and write is protected"
   ).toBe(401);
   for (const url of [
     "/admin/dashboard",
+    "/admin/profile",
     "/admin/projects",
     "/admin/projects/new",
     "/admin/experience",
