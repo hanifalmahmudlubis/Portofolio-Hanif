@@ -1,173 +1,58 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcrypt";
-
-import { prisma } from "./prisma";
-
 import type { NextAuthOptions } from "next-auth";
-import type { JWT } from "next-auth/jwt";
-
-
+import { prisma } from "./prisma";
+import { rateLimit } from "./rate-limit";
 export const authOptions: NextAuthOptions = {
-
-
-  adapter: PrismaAdapter(prisma),
-
-
-  session: {
-    strategy: "jwt",
-  },
-
-
+  session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
   providers: [
-
     CredentialsProvider({
-
-      name: "Credentials",
-
-
+      name: "Email dan password",
       credentials: {
-
-        email: {
-          label: "Email",
-          type: "email",
-        },
-
-
-        password: {
-          label: "Password",
-          type: "password",
-        },
-
-
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
-
-
       async authorize(credentials) {
-
-
-        if (!credentials?.email || !credentials.password) {
-
+        if (
+          !credentials?.email ||
+          !credentials.password ||
+          credentials.email.length > 254 ||
+          credentials.password.length > 72
+        )
           return null;
-
-        }
-
-
-        const user = await prisma.user.findUnique({
-
-          where:{
-            email: credentials.email
-          }
-
-        });
-
-
-
-        if(!user){
-
+        const email = credentials.email.trim().toLowerCase();
+        try {
+          rateLimit(`login:${email}`, 10);
+        } catch {
           return null;
-
         }
-
-
-
-        const passwordMatch = await bcrypt.compare(
-
-          credentials.password,
-
-          user.password
-
-        );
-
-
-
-        if(!passwordMatch){
-
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (
+          !user ||
+          user.role !== "ADMIN" ||
+          !(await bcrypt.compare(credentials.password, user.password))
+        )
           return null;
-
-        }
-
-
-
-        return {
-
-          id:user.id,
-
-          email:user.email,
-
-          role:user.role,
-
-        };
-
-
+        return { id: user.id, email: user.email, role: user.role };
       },
-
-
     }),
-
-
   ],
-
-
-
-
-  callbacks:{
-
-
-    async jwt({token,user}){
-
-
-      if(user){
-
-        token.id=user.id;
-
-        token.role=user.role;
-
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
       }
-
-
       return token;
-
-
     },
-
-
-
-    async session({session,token}){
-
-
-      if(session.user){
-
-
+    async session({ session, token }) {
+      if (session.user) {
         session.user.id = token.id as string;
-
         session.user.role = token.role as string;
-
-
       }
-
-
       return session;
-
-
     },
-
-
   },
-
-
-
-  pages:{
-
-
-    signIn:"/admin/login"
-
-
-  },
-
-
-
+  pages: { signIn: "/admin/login" },
   secret: process.env.NEXTAUTH_SECRET,
-
-
 };

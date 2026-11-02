@@ -1,350 +1,49 @@
-import { prisma } from "@/lib/prisma";
+import { ArrowUpRight } from "lucide-react";
+import type { Certificate as CertificateType } from "@/types/project";
 import Container from "../ui/Container";
-import { Award, ExternalLink } from "lucide-react";
-
-
-
-export default async function Certificate(){
-
-
-const certificates =
-await prisma.certificate.findMany({
-
-orderBy:{
-createdAt:"desc"
-}
-
-});
-
-
-
-
-return (
-
-<section
-
-id="certificates"
-
-className="
-bg-[#09090B]
-
-py-32
-
-text-white
-
-"
-
->
-
-
-<Container>
-
-
-
-<div
-className="
-max-w-3xl
-"
->
-
-
-<p
-
-className="
-text-sm
-
-uppercase
-
-tracking-[0.3em]
-
-text-indigo-400
-
-"
-
->
-
-Certificates
-
-</p>
-
-
-
-
-<h2
-
-className="
-mt-5
-
-text-4xl
-
-md:text-5xl
-
-font-bold
-
-"
-
->
-
-Professional Achievements
-
-</h2>
-
-
-
-
-<p
-
-className="
-mt-5
-
-text-zinc-400
-
-"
-
->
-
-A collection of certificates and achievements
-that support my professional growth.
-
-</p>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-<div
-
-className="
-mt-16
-
-grid
-
-gap-8
-
-md:grid-cols-3
-
-"
-
->
-
-
-{
-
-certificates.map((item)=>(
-
-
-<div
-
-key={item.id}
-
-className="
-rounded-3xl
-
-border
-
-border-white/10
-
-bg-white/[0.03]
-
-p-8
-
-transition
-
-hover:-translate-y-2
-
-hover:border-indigo-500/40
-
-"
-
->
-
-
-
-<div
-
-className="
-w-12
-
-h-12
-
-rounded-2xl
-
-bg-indigo-500/10
-
-flex
-
-items-center
-
-justify-center
-
-text-indigo-400
-
-"
-
->
-
-
-<Award size={24}/>
-
-
-</div>
-
-
-
-
-
-
-<h3
-
-className="
-mt-6
-
-text-xl
-
-font-semibold
-
-"
-
->
-
-{item.title}
-
-</h3>
-
-
-
-
-
-<p
-
-className="
-mt-3
-
-text-indigo-400
-
-font-medium
-
-"
-
->
-
-{item.issuer}
-
-</p>
-
-
-
-
-
-
-<div
-
-className="
-mt-4
-
-inline-flex
-
-rounded-full
-
-border
-
-border-white/10
-
-bg-white/5
-
-px-4
-
-py-2
-
-text-sm
-
-text-zinc-400
-
-"
-
->
-
-{item.year}
-
-</div>
-
-
-
-
-
-
-
-{
-
-item.credentialUrl && (
-
-<a
-
-href={item.credentialUrl}
-
-target="_blank"
-
-className="
-mt-6
-
-flex
-
-items-center
-
-gap-2
-
-text-sm
-
-text-zinc-300
-
-hover:text-white
-
-"
-
->
-
-View Credential
-
-<ExternalLink size={15}/>
-
-</a>
-
-
-)
-
-}
-
-
-
-</div>
-
-
-
-))
-
-
-}
-
-
-
-</div>
-
-
-
-
-
-</Container>
-
-
-</section>
-
-)
-
+import SectionHeading from "../ui/SectionHeading";
+import Reveal from "../ui/Reveal";
+import { safeUrl } from "@/lib/urls";
+export default function Certificate({
+  certificates,
+}: {
+  certificates: CertificateType[];
+}) {
+  return (
+    <section id="certificates" className="section">
+      <Container>
+        <SectionHeading title="Certificates" />
+        <div className="grid gap-x-12 md:grid-cols-2">
+          {certificates.map((item, index) => (
+            <Reveal key={item.id} delay={(index % 2) * 0.06}>
+              <article className="flex h-full items-start justify-between gap-5 border-t border-border py-7">
+                <div>
+                  <p className="muted mb-2 text-xs">
+                    {item.issuer} · {item.year}
+                  </p>
+                  <h3 className="text-base font-medium leading-7">
+                    {item.title}
+                  </h3>
+                </div>
+                {safeUrl(item.credentialUrl) && (
+                  <a
+                    href={safeUrl(item.credentialUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`View credential: ${item.title}`}
+                    className="icon-button shrink-0"
+                  >
+                    <ArrowUpRight size={17} />
+                  </a>
+                )}
+              </article>
+            </Reveal>
+          ))}
+        </div>
+        {!certificates.length && (
+          <p className="muted text-sm">No certificates yet.</p>
+        )}
+      </Container>
+    </section>
+  );
 }

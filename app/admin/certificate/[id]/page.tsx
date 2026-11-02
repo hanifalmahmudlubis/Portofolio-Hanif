@@ -1,90 +1,25 @@
-import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import EditCertificateForm from "./EditCertificateForm";
-
-
-
+import { requireAdminPage } from "@/lib/admin";
+import { prisma } from "@/lib/prisma";
+import CertificateForm from "@/components/admin/CertificateForm";
+import PageHeading from "@/components/admin/PageHeading";
 export default async function Page({
-
-params
-
-}:{
-
-params: Promise<{
-id:string
-}>
-
-}){
-
-
-const {id} = await params;
-
-
-
-const certificate = await prisma.certificate.findUnique({
-
-where:{
-
-id:id
-
-}
-
-});
-
-
-
-if(!certificate){
-
-notFound();
-
-}
-
-
-
-return (
-
-<main className="
-min-h-screen
-bg-black
-text-white
-p-8
-">
-
-
-<div className="
-max-w-4xl
-mx-auto
-">
-
-
-<h1 className="
-text-3xl
-font-bold
-mb-8
-">
-
-Edit Certificate
-
-</h1>
-
-
-
-
-<EditCertificateForm
-
-certificate={certificate}
-
-/>
-
-
-
-</div>
-
-
-</main>
-
-
-)
-
-
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  await requireAdminPage();
+  const { id } = await params;
+  const item = await prisma.certificate.findUnique({ where: { id } });
+  if (!item) notFound();
+  return (
+    <>
+      <PageHeading
+        title="Edit sertifikat"
+        description="Perbarui informasi yang tampil di portofolio Anda."
+        back="/admin/certificate"
+      />
+      <CertificateForm certificate={item} />
+    </>
+  );
 }

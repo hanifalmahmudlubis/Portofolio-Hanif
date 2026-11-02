@@ -1,42 +1,13 @@
-import Sidebar from "@/components/admin/Sidebar";
-import Header from "@/components/admin/Header";
-
-
+import type { Metadata } from "next";
+import AdminShell from "@/components/admin/Shell";
+export const metadata: Metadata = {
+  title: "Portfolio Studio",
+  robots: { index: false, follow: false },
+};
 export default function AdminLayout({
-children
-}:{
-children:React.ReactNode
-}){
-
-
-return (
-
-<div className="
-flex
-min-h-screen
-bg-black
-">
-
-
-<Sidebar/>
-
-
-<div className="
-flex-1
-">
-
-
-<Header/>
-
-
-{children}
-
-
-</div>
-
-
-</div>
-
-)
-
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <AdminShell>{children}</AdminShell>;
 }

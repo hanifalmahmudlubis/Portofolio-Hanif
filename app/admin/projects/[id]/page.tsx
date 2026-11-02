@@ -1,138 +1,29 @@
-import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import EditProjectForm from "./EditProjectForm";
-
-
-
-export default async function EditProjectPage({
-
-params,
-
+import { requireAdminPage } from "@/lib/admin";
+import { prisma } from "@/lib/prisma";
+import { listTechnologies, projectInclude } from "@/lib/services/portfolio";
+import ProjectForm from "@/components/admin/ProjectForm";
+import PageHeading from "@/components/admin/PageHeading";
+export default async function Page({
+  params,
 }: {
-
-params: Promise<{
-id:string;
-}>;
-
+  params: Promise<{ id: string }>;
 }) {
-
-
-
-const {id} = await params;
-
-
-
-
-
-const project = await prisma.project.findUnique({
-
-where:{
-
-id:id
-
-},
-
-
-include:{
-
-
-images:{
-
-
-orderBy:{
-
-
-displayOrder:"asc"
-
-
-}
-
-
-}
-
-
-}
-
-
-});
-
-
-
-
-
-
-if(!project){
-
-notFound();
-
-}
-
-
-
-
-
-
-
-return (
-
-
-<main
-
-className="
-min-h-screen
-bg-black
-text-white
-p-8
-"
-
->
-
-
-<div
-
-className="
-max-w-5xl
-mx-auto
-"
-
->
-
-
-<h1
-
-className="
-text-3xl
-font-bold
-mb-8
-"
-
->
-
-Edit Project
-
-</h1>
-
-
-
-
-
-<EditProjectForm
-
-project={project}
-
-/>
-
-
-
-
-
-</div>
-
-
-</main>
-
-
-);
-
-
+  await requireAdminPage();
+  const { id } = await params;
+  const [project, technologies] = await Promise.all([
+    prisma.project.findUnique({ where: { id }, include: projectInclude }),
+    listTechnologies(),
+  ]);
+  if (!project) notFound();
+  return (
+    <>
+      <PageHeading
+        title="Edit proyek"
+        description="Perbarui detail karya, gambar, dan publikasi Anda."
+        back="/admin/projects"
+      />
+      <ProjectForm project={project} technologies={technologies} />
+    </>
+  );
 }
