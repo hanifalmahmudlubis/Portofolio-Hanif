@@ -1,14 +1,17 @@
 "use client";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 export default function LoginForm() {
+  const { status } = useSession();
+  const preparingSession = status === "loading";
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busy || preparingSession) return;
     setBusy(true);
     setError("");
     const data = new FormData(event.currentTarget);
@@ -19,7 +22,15 @@ export default function LoginForm() {
         redirect: false,
         callbackUrl: "/admin/dashboard",
       });
-      if (response?.error || !response?.ok) {
+      const destination = response?.url
+        ? new URL(response.url, window.location.origin)
+        : null;
+      if (
+        response?.error ||
+        !response?.ok ||
+        destination?.origin !== window.location.origin ||
+        destination.pathname !== "/admin/dashboard"
+      ) {
         setError(
           "Email atau password tidak sesuai, atau terlalu banyak percobaan. Silakan coba lagi.",
         );
@@ -85,8 +96,15 @@ export default function LoginForm() {
                 {error}
               </p>
             )}
-            <button disabled={busy} className="button button-primary w-full">
-              {busy ? "Memeriksa akun…" : "Masuk"}
+            <button
+              disabled={busy || preparingSession}
+              className="button button-primary w-full"
+            >
+              {preparingSession
+                ? "Menyiapkan sesi…"
+                : busy
+                  ? "Memeriksa akun…"
+                  : "Masuk"}
             </button>
           </form>
         </div>

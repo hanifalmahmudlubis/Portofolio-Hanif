@@ -16,8 +16,8 @@ export default function ProjectCard({
       project.images[0]?.imageUrl,
   );
   return (
-    <Reveal delay={(index % 2) * 0.06} className="h-full">
-      <article className="project-card">
+    <Reveal delay={(index % 2) * 0.06} from="up" className="project-reveal">
+      <article className={`project-card ${cover ? "has-cover" : ""}`}>
         {cover && (
           <Link
             href={`/projects/${project.slug}`}
@@ -28,44 +28,40 @@ export default function ProjectCard({
               src={cover}
               alt={project.title}
               fill
-              sizes="(max-width: 767px) 100vw, 560px"
+              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 410px"
               className="object-cover"
             />
           </Link>
         )}
         <div className="project-card-content">
-          <div className="mb-6 flex items-center justify-between gap-4">
-            <span className="text-xs text-primary">{project.category}</span>
-            <span className="text-xs text-[#7887a1]">{project.year}</span>
+          <div className="project-meta">
+            <span className="project-category">{project.category}</span>
+            <span className="project-year">{project.year}</span>
           </div>
           <Link
             href={`/projects/${project.slug}`}
             aria-label={`View project: ${project.title}`}
-            className="group"
+            className="project-title-link"
+            title={project.title}
           >
-            <h3 className="text-xl font-medium leading-snug tracking-[-.025em] transition-colors group-hover:text-primary md:text-2xl">
-              {project.title}
-            </h3>
+            <h3 className="project-title">{project.title}</h3>
           </Link>
-          <p className="muted mt-4 line-clamp-2 text-sm leading-7">
-            {project.shortDescription}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {project.technologies.map(({ technology }) => (
-              <span key={technology.id} className="tag">
-                {technology.name}
-              </span>
-            ))}
-          </div>
-          <div className="mt-auto flex items-center justify-between border-t border-border pt-5">
-            <span className="text-xs text-[#7887a1]">
+          <p className="project-description">{project.shortDescription}</p>
+          {!!project.technologies.length && (
+            <div className="project-technologies">
+              {project.technologies.map(({ technology }) => (
+                <span key={technology.id} className="tag">
+                  {technology.name}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="project-card-footer">
+            <span className="text-xs text-[#94a3bd]">
               {project.projectType}
             </span>
-            <Link
-              href={`/projects/${project.slug}`}
-              className="inline-flex items-center gap-2 text-xs text-primary"
-            >
-              View project <ArrowUpRight size={14} />
+            <Link href={`/projects/${project.slug}`} className="project-open">
+              View project <ArrowUpRight size={15} aria-hidden="true" />
             </Link>
           </div>
         </div>

@@ -34,7 +34,10 @@ export async function signInUi(
     .getByLabel("Password", { exact: true })
     .fill(process.env[`${prefix}_PASSWORD`]!);
   await page.getByRole("button", { name: "Masuk" }).click();
-  await expect(page).toHaveURL(/\/admin\/dashboard/);
+  await page.waitForURL(/\/admin\/dashboard/, { waitUntil: "load" });
+  await expect(
+    page.getByRole("heading", { name: "Ringkasan", exact: true }),
+  ).toBeVisible();
 }
 export const sampleProject = {
   title: "API integration project",

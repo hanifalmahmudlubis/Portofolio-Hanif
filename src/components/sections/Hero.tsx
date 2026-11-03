@@ -10,26 +10,42 @@ export default function Hero({
 }) {
   return (
     <section id="intro" className="hero-section">
-      <Container>
+      <Container className="relative">
         <div className="hero-grid">
-          <Reveal>
-            <h1 className="hero-title">Hanif Al Mahmud Lubis</h1>
-            <p className="hero-role mt-5">Software Engineering Graduate</p>
-            <p className="muted mt-7 max-w-xl text-lg leading-relaxed">
-              Software Engineering graduate from Politeknik Negeri Medan,
-              building web applications, mobile experiences, and machine
-              learning solutions
+          <div className="hero-copy">
+            <h1 className="hero-title">
+              <Reveal as="span" from="left" delay={0.08} repeat>
+                Hanif Al
+              </Reveal>{" "}
+              <Reveal
+                as="span"
+                from="right"
+                delay={0.2}
+                repeat
+                className="hero-name-accent"
+              >
+                Mahmud Lubis
+              </Reveal>
+            </h1>
+            <Reveal from="up" delay={0.32}>
+              <p className="hero-role">Software Engineering Graduate</p>
+            </Reveal>
+            <p className="hero-description">
+              Building practical solutions through web, mobile, and machine
+              learning
+              <span className="block mt-3">
+                A graduate of Politeknik Negeri Medan
+              </span>
             </p>
-            <p className="mt-4 text-sm text-[#9ba6ba]">Medan, Indonesia</p>
-            <div className="mt-9 flex flex-wrap gap-3">
+            <Reveal from="fade" delay={0.4} className="hero-actions">
               <a href="#projects" className="button button-primary">
-                View projects <ArrowUpRight size={16} />
+                Explore projects <ArrowUpRight size={18} />
               </a>
               <a href="#contact" className="button button-secondary">
                 Contact me
               </a>
-            </div>
-            <div className="mt-9 flex items-center gap-6">
+            </Reveal>
+            <div className="hero-socials">
               <a
                 href={site.github}
                 target="_blank"
@@ -51,16 +67,21 @@ export default function Hero({
                 LinkedIn
               </a>
             </div>
-          </Reveal>
-          <Reveal delay={0.12} className="hero-photo-wrap">
-            <div className="hero-portrait">
-              <Image
-                src={photoUrl}
-                alt="Hanif Al Mahmud Lubis"
-                fill
-                priority
-                sizes="(max-width: 767px) 320px, 380px"
-              />
+          </div>
+          <Reveal from="fade" delay={0.24} className="hero-photo-wrap">
+            <div className="portrait-frame">
+              <div className="hero-portrait">
+                <Image
+                  src={photoUrl}
+                  alt="Hanif Al Mahmud Lubis"
+                  fill
+                  preload
+                  sizes="(max-width: 767px) 320px, (max-width: 1023px) 300px, 380px"
+                />
+              </div>
+              <div className="portrait-caption">
+                <span>Medan, Indonesia</span>
+              </div>
             </div>
           </Reveal>
         </div>

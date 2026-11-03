@@ -27,9 +27,9 @@ export default async function ProjectDetailPage({ params }: Props) {
   return (
     <>
       <Header />
-      <main id="main" className="pb-24">
+      <main id="main" className="project-detail pb-24">
         <Container>
-          <Reveal className="pb-10 pt-12 md:pt-16">
+          <Reveal from="left" className="pb-10 pt-12 md:pt-16">
             <Link
               href="/projects"
               className="muted mb-10 inline-flex items-center gap-2 text-xs hover:text-[#91a6df]"
@@ -42,9 +42,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                 / {project.year}
               </span>
             </div>
-            <h1 className="mt-5 max-w-4xl text-3xl font-medium leading-[1.18] tracking-[-.035em] md:text-5xl">
-              {project.title}
-            </h1>
+            <h1 className="detail-title">{project.title}</h1>
             <p className="muted mt-5 max-w-2xl text-sm leading-7 md:text-base">
               {project.shortDescription}
             </p>

@@ -57,8 +57,12 @@ if (!process.argv.includes("--code-only")) {
     "NEXTAUTH_SECRET has at least 32 characters",
   );
   check(
-    Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim()),
-    "BLOB_READ_WRITE_TOKEN configured for a Public Blob store",
+    Boolean(
+      process.env.BLOB_READ_WRITE_TOKEN?.trim() ||
+      (process.env.BLOB_STORE_ID?.trim() &&
+        (process.env.VERCEL_OIDC_TOKEN?.trim() || process.env.VERCEL?.trim())),
+    ),
+    "Public Blob store configured with Vercel OIDC or BLOB_READ_WRITE_TOKEN",
   );
 }
 if (failures.length) {

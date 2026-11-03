@@ -87,6 +87,15 @@ test("header marks the visible section, deep links and project routes on desktop
     navigation.getByRole("link", { name: "Skills", exact: true }),
   ).toHaveAttribute("aria-current", "location");
   await page.setViewportSize({ width: 390, height: 844 });
+  // Resizing reflows the cards, so establish the visible section on mobile.
+  await page
+    .locator("#skills")
+    .evaluate((section) =>
+      section.scrollIntoView({ block: "start", behavior: "instant" }),
+    );
+  await expect(
+    page.locator('nav[aria-label="Main navigation"] a[href="/#skills"]'),
+  ).toHaveAttribute("aria-current", "location");
   await page.getByRole("button", { name: "Open navigation" }).click();
   const mobile = page.getByRole("navigation", { name: "Mobile navigation" });
   await expect(

@@ -11,6 +11,10 @@ import { ApiError, readJson } from "../src/lib/api/errors";
 import { prepareImages, persistImages } from "../src/lib/uploads";
 import { MAX_IMAGE_SIZE, MAX_UPLOAD_BODY } from "../src/lib/upload-config";
 import { compareExperienceDates } from "../src/lib/dates";
+import { createServer } from "node:http";
+import { once } from "node:events";
+import type { AddressInfo } from "node:net";
+import { removeUpload } from "../src/lib/uploads";
 const project = {
   title: "Project",
   slug: "my-project",
@@ -182,8 +186,12 @@ test("multipart uploads stay below the Vercel payload limit", async () => {
 test("Vercel without Blob configuration never falls back to writing local files", async () => {
   const originalVercel = process.env.VERCEL;
   const originalToken = process.env.BLOB_READ_WRITE_TOKEN;
+  const originalStore = process.env.BLOB_STORE_ID;
+  const originalOidc = process.env.VERCEL_OIDC_TOKEN;
   process.env.VERCEL = "1";
   delete process.env.BLOB_READ_WRITE_TOKEN;
+  delete process.env.BLOB_STORE_ID;
+  delete process.env.VERCEL_OIDC_TOKEN;
   try {
     await assert.rejects(
       persistImages([]),
@@ -194,6 +202,115 @@ test("Vercel without Blob configuration never falls back to writing local files"
     else process.env.VERCEL = originalVercel;
     if (originalToken === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
     else process.env.BLOB_READ_WRITE_TOKEN = originalToken;
+    if (originalStore === undefined) delete process.env.BLOB_STORE_ID;
+    else process.env.BLOB_STORE_ID = originalStore;
+    if (originalOidc === undefined) delete process.env.VERCEL_OIDC_TOKEN;
+    else process.env.VERCEL_OIDC_TOKEN = originalOidc;
+  }
+});
+
+test("cloud uploads and cleanup work with static tokens and Vercel OIDC credentials", async () => {
+  const keys = [
+    "VERCEL",
+    "BLOB_READ_WRITE_TOKEN",
+    "BLOB_STORE_ID",
+    "VERCEL_OIDC_TOKEN",
+    "VERCEL_BLOB_API_URL",
+  ];
+  const originals = keys.map((key) => [key, process.env[key]] as const);
+  const contextSymbol = Symbol.for("@vercel/request-context");
+  const globals = globalThis as typeof globalThis & Record<symbol, unknown>;
+  const originalContext = globals[contextSymbol];
+  try {
+    for (const mode of ["static", "oidc-env", "oidc-context"]) {
+      const requests: {
+        authorization: string | undefined;
+        storeId: string | undefined;
+        method: string | undefined;
+      }[] = [];
+      const name = "00000000-0000-4000-8000-000000000001.png";
+      const blobUrl = `https://unitstore.public.blob.vercel-storage.com/profile/${name}`;
+      const server = createServer(async (request, response) => {
+        for await (const chunk of request) {
+          void chunk;
+        }
+        requests.push({
+          authorization: request.headers.authorization,
+          storeId: request.headers["x-vercel-blob-store-id"] as
+            string | undefined,
+          method: request.method,
+        });
+        response.setHeader("Content-Type", "application/json");
+        response.end(
+          JSON.stringify(
+            request.method === "PUT"
+              ? {
+                  url: blobUrl,
+                  downloadUrl: blobUrl,
+                  pathname: `profile/${name}`,
+                  contentType: "image/png",
+                  contentDisposition: "inline",
+                }
+              : {},
+          ),
+        );
+      });
+      server.listen(0, "127.0.0.1");
+      await once(server, "listening");
+      try {
+        process.env.VERCEL = "1";
+        process.env.VERCEL_BLOB_API_URL = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+        process.env.BLOB_READ_WRITE_TOKEN =
+          mode === "static" ? "vercel_blob_rw_unitstore_test" : "";
+        process.env.BLOB_STORE_ID = "store_unitstore";
+        process.env.VERCEL_OIDC_TOKEN =
+          mode === "oidc-env" ? "test-oidc-token" : "";
+        if (mode === "oidc-context")
+          globals[contextSymbol] = {
+            get: () => ({
+              headers: { "x-vercel-oidc-token": "test-oidc-token" },
+            }),
+          };
+        else delete globals[contextSymbol];
+        const files = [
+          {
+            buffer: Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+            name,
+            collection: "profile" as const,
+            url: `/uploads/profile/${name}`,
+          },
+        ];
+        await persistImages(files);
+        assert.equal(files[0].url, blobUrl, mode);
+        await removeUpload(files[0].url);
+        assert.equal(
+          requests.length,
+          2,
+          `${mode}: upload and cleanup both reached Blob`,
+        );
+        assert.equal(requests[0].method, "PUT");
+        const expectedToken =
+          mode === "static"
+            ? "vercel_blob_rw_unitstore_test"
+            : "test-oidc-token";
+        for (const request of requests) {
+          assert.equal(request.authorization, `Bearer ${expectedToken}`, mode);
+          assert.equal(request.storeId, "unitstore", mode);
+        }
+      } finally {
+        server.closeAllConnections();
+        await new Promise<void>((resolve, reject) =>
+          server.close((error) => (error ? reject(error) : resolve())),
+        );
+      }
+    }
+  } finally {
+    for (const [key, value] of originals) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    if (originalContext === undefined) delete globals[contextSymbol];
+    else globals[contextSymbol] = originalContext;
   }
 });
 test("uploaded file names are generated independently of user-supplied paths", async () => {

@@ -1,9 +1,10 @@
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { del, put } from "@vercel/blob";
+import { BlobError, del, put } from "@vercel/blob";
 import { ApiError } from "./api/errors";
 import { readBody } from "./api/body";
+import { hasBlobStorage } from "./blob-config";
 import {
   MAX_IMAGE_SIZE,
   MAX_UPLOAD_BODY,
@@ -68,14 +69,14 @@ export async function prepareImages(
 export async function persistImages(
   images: Awaited<ReturnType<typeof prepareImages>>,
 ) {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (process.env.VERCEL && !token)
+  const cloudStorage = hasBlobStorage();
+  if (process.env.VERCEL && !cloudStorage)
     throw new ApiError(
       503,
-      "Penyimpanan gambar belum dikonfigurasi. Hubungkan Vercel Blob pada project ini.",
+      "Penyimpanan gambar belum dikonfigurasi. Hubungkan Public Blob store ke environment Vercel yang digunakan, lalu redeploy project.",
     );
   try {
-    if (token) {
+    if (cloudStorage) {
       for (const image of images) {
         const blob = await put(
           `${image.collection}/${image.name}`,
@@ -83,7 +84,6 @@ export async function persistImages(
           {
             access: "public",
             addRandomSuffix: false,
-            token,
           },
         );
         image.url = blob.url;
@@ -99,6 +99,11 @@ export async function persistImages(
     }
   } catch (error) {
     await Promise.all(images.map((image) => removeUpload(image.url)));
+    if (error instanceof BlobError)
+      throw new ApiError(
+        503,
+        "Upload gambar gagal. Periksa koneksi Public Blob store dan izin environment deployment di Vercel, lalu coba lagi.",
+      );
     throw error;
   }
 }
@@ -112,9 +117,9 @@ export async function removeUpload(url: string) {
       )
     )
       return;
-    if (!process.env.BLOB_READ_WRITE_TOKEN) return;
+    if (!hasBlobStorage()) return;
     try {
-      await del(url, { token: process.env.BLOB_READ_WRITE_TOKEN });
+      await del(url);
     } catch {
       console.error("Could not remove unused cloud upload.");
     }

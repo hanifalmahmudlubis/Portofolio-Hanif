@@ -4,6 +4,7 @@ import Container from "../ui/Container";
 import Reveal from "../ui/Reveal";
 import { api, errorMessage } from "@/lib/api-client";
 import { site } from "@/lib/site";
+import { Github, Linkedin } from "lucide-react";
 export default function Contact() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -29,38 +30,37 @@ export default function Contact() {
   return (
     <section id="contact" className="section">
       <Container>
-        <div className="grid gap-10 md:grid-cols-[1fr_1.3fr]">
-          <Reveal>
+        <div className="contact-layout">
+          <Reveal from="left" repeat className="contact-copy">
             <h2 className="section-title">Contact</h2>
-            <p className="muted mt-4 text-sm">For projects and opportunities</p>
-            <a
-              href={`mailto:${site.email}`}
-              className="mt-6 inline-block break-all text-sm text-primary"
-            >
-              {site.email}
+            <p className="contact-description">
+              For projects and work opportunities
+            </p>
+            <a href={`mailto:${site.email}`} className="contact-email">
+              <span>{site.email}</span>
             </a>
-            <div className="mt-6 flex gap-6 text-xs text-[#9ba6ba]">
+            <div className="contact-socials">
               <a
                 href={site.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-primary"
+                className="social-link"
               >
-                GitHub
+                <Github size={17} /> GitHub
               </a>
               <a
                 href={site.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-primary"
+                className="social-link"
               >
-                LinkedIn
+                <Linkedin size={17} /> LinkedIn
               </a>
             </div>
           </Reveal>
-          <Reveal delay={0.08}>
+          <Reveal from="up" delay={0.12}>
             {sent ? (
-              <div role="status" className="admin-panel">
+              <div role="status" className="contact-form contact-success">
                 <h3 className="text-xl">Message received</h3>
                 <p className="muted mt-3 text-sm">
                   Thank you, I’ll reply by email
@@ -73,7 +73,7 @@ export default function Contact() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={submit} className="space-y-5">
+              <form onSubmit={submit} className="contact-form space-y-5">
                 <div className="grid gap-5 sm:grid-cols-2">
                   <label className="field">
                     Your name
@@ -127,7 +127,10 @@ export default function Contact() {
                     {error}
                   </p>
                 )}
-                <button disabled={busy} className="button button-primary">
+                <button
+                  disabled={busy}
+                  className="button button-primary w-full"
+                >
                   {busy ? "Sending…" : "Send message"}
                 </button>
               </form>

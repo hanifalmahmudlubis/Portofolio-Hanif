@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Github, Linkedin, Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { site } from "@/lib/site";
 const menus = [
   ["Intro", "/#intro"],
@@ -15,7 +15,49 @@ const menus = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [visibleSection, setVisibleSection] = useState("intro");
+  const navigationFrame = useRef(0);
   const pathname = usePathname();
+  function navigate(event: MouseEvent<HTMLAnchorElement>, href: string) {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+    setOpen(false);
+    if (pathname !== "/") return;
+    const id = href.split("#")[1];
+    const section = document.getElementById(id);
+    if (!section) return;
+    event.preventDefault();
+    setVisibleSection(id);
+    if (window.location.hash !== `#${id}`)
+      window.history.pushState(null, "", href);
+    cancelAnimationFrame(navigationFrame.current);
+    navigationFrame.current = requestAnimationFrame(() => {
+      section.scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
+    });
+  }
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const section = document.getElementById(window.location.hash.slice(1));
+    const frame = section
+      ? requestAnimationFrame(() =>
+          section.scrollIntoView({ block: "start", behavior: "instant" }),
+        )
+      : 0;
+    return () => {
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(navigationFrame.current);
+    };
+  }, [pathname]);
   const activeSection =
     pathname === "/"
       ? visibleSection
@@ -91,12 +133,13 @@ export default function Header() {
           </Link>
           <nav
             aria-label="Main navigation"
-            className="hidden items-center gap-5 xl:gap-7 lg:flex"
+            className="hidden items-center gap-1 xl:gap-2 lg:flex"
           >
             {menus.map(([label, href]) => (
               <Link
                 key={label}
                 href={href}
+                onClick={(event) => navigate(event, href)}
                 className="public-nav-link"
                 aria-current={current(href)}
               >
@@ -138,13 +181,13 @@ export default function Header() {
           <nav
             id="mobile-navigation"
             aria-label="Mobile navigation"
-            className="container flex flex-col gap-1 border-t border-border py-4 lg:hidden"
+            className="flex flex-col gap-1 border-t border-border py-4 lg:hidden"
           >
             {menus.map(([label, href]) => (
               <Link
                 key={label}
                 href={href}
-                onClick={() => setOpen(false)}
+                onClick={(event) => navigate(event, href)}
                 className="public-nav-link !py-3"
                 aria-current={current(href)}
               >

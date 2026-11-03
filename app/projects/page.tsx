@@ -14,13 +14,13 @@ export default async function ProjectsPage() {
       <Header />
       <main id="main" className="pb-24">
         <Container>
-          <Reveal className="pb-12 pt-16">
-            <h1 className="text-4xl font-medium tracking-tight md:text-5xl">
-              Projects
-            </h1>
-            <p className="muted mt-4 text-sm">
-              Web, mobile, and machine learning
-            </p>
+          <Reveal from="down" className="archive-heading">
+            <div>
+              <h1 className="archive-title">Projects</h1>
+              <p className="muted mt-4 text-base">
+                Web, mobile, and machine learning
+              </p>
+            </div>
           </Reveal>
           <ProjectGrid projects={projects} searchable />
         </Container>

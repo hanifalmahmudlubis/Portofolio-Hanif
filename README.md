@@ -19,18 +19,21 @@ Repository sudah menyediakan `vercel.json`, Node.js 22, build Next.js, dan gener
 1. Push source ke GitHub dan import repository di Vercel. Pilih framework **Next.js**, root directory project ini, install command `npm ci`, dan build command `npm run build`. Output directory mengikuti default Next.js.
 2. Isi Environment Variables di Vercel:
 
-   | Variabel                | Isi                                                                                                                    |
-   | ----------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-   | `DATABASE_URL`          | PostgreSQL hosted yang bisa diakses Vercel, dengan SSL sesuai penyedia; gunakan pooled URL untuk runtime jika tersedia |
-   | `NEXTAUTH_URL`          | Domain HTTPS deployment, misalnya `https://nama-project.vercel.app`; jangan `localhost`                                |
-   | `NEXTAUTH_SECRET`       | Secret acak minimal 32 karakter; gunakan nilai yang sama untuk seluruh instance                                        |
-   | `BLOB_READ_WRITE_TOKEN` | Token dari **Public Blob store** yang dihubungkan melalui Storage project Vercel                                       |
+   | Variabel                | Isi                                                                                                                      |
+   | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+   | `DATABASE_URL`          | PostgreSQL hosted yang bisa diakses Vercel, dengan SSL sesuai penyedia; gunakan pooled URL untuk runtime jika tersedia   |
+   | `NEXTAUTH_URL`          | Domain HTTPS deployment, misalnya `https://nama-project.vercel.app`; jangan `localhost`                                  |
+   | `NEXTAUTH_SECRET`       | Secret acak minimal 32 karakter; gunakan nilai yang sama untuk seluruh instance                                          |
+   | `BLOB_STORE_ID`         | ID **Public Blob store** yang terhubung ke project dan environment deployment; pada Vercel dipakai bersama OIDC otomatis |
+   | `BLOB_READ_WRITE_TOKEN` | Alternatif token statis dari store yang sama, terutama untuk upload dari server lokal di luar Vercel                     |
 
 3. Sebelum menjalankan aplikasi pada database baru, jalankan `npm run db:migrate` menggunakan koneksi database tujuan. Jika belum ada admin, isi `ADMIN_EMAIL` dan `ADMIN_PASSWORD`, lalu jalankan `npm run db:seed` sekali. Kredensial seed tidak perlu disimpan di Git atau disediakan ke frontend.
 4. Jalankan `npm run check:deploy` dengan environment produksi untuk memeriksa konfigurasi tanpa mencetak secret. Gunakan `npm run check:deploy -- --code-only` untuk pemeriksaan source tanpa kredensial produksi.
 5. Jalankan `npm run build`, kemudian deploy. Pastikan variabel tersedia pada environment Production/Preview yang dituju. Gunakan database terpisah untuk Preview agar konten produksi tidak berubah saat menguji CRUD.
 
-Upload pada Vercel menggunakan Vercel Blob, bukan disk lokal. Admin tetap dapat memilih 8 gambar sekaligus; tiap gambar dikirim terpisah dengan batas **4 MB/gambar**, sehingga request multipart berada di bawah batas 4.5 MB Vercel Functions. Gambar yang sudah sukses diunggah tidak dikirim ulang ketika berkas berikutnya gagal. Tanpa token Blob, API memberi pesan konfigurasi yang jelas dan tidak mencoba menulis ke filesystem Vercel.
+Upload pada Vercel menggunakan Vercel Blob, bukan disk lokal. SDK menerima autentikasi OIDC otomatis dari Vercel bersama `BLOB_STORE_ID`, atau `BLOB_READ_WRITE_TOKEN` sebagai alternatif. Kode tidak menyalin token OIDC sehingga SDK tetap dapat mengambil kredensial runtime terbaru. Admin tetap dapat memilih 8 gambar sekaligus; tiap gambar dikirim terpisah dengan batas **4 MB/gambar**, sehingga request multipart berada di bawah batas 4.5 MB Vercel Functions. Gambar yang sudah sukses diunggah tidak dikirim ulang ketika berkas berikutnya gagal. Tanpa konfigurasi Blob, API memberi pesan konfigurasi dan tidak menulis ke filesystem Vercel.
+
+Jika upload foto intro menampilkan **Penyimpanan gambar belum dikonfigurasi**, buka project Vercel yang melayani domain situs, lalu hubungkan **Public Blob store** melalui tab Storage ke environment **Production** (dan Preview bila digunakan). Pastikan `BLOB_STORE_ID` tersedia, atau tambahkan `BLOB_READ_WRITE_TOKEN` pada Settings → Environment Variables. Setelah disimpan, lakukan **Redeploy**: perubahan environment tidak berlaku pada deployment lama. File `.env` lokal tidak ikut diunggah dan bukan pengganti pengaturan environment Vercel. Jangan menambahkan prefiks `NEXT_PUBLIC_` pada token.
 
 Gambar lama yang masih direferensikan database disertakan di `public/portfolio`. Rewrite `/uploads/projects/:file` mempertahankan URL lama saat berkas tidak ada di folder upload lokal. File upload lain tetap lokal dan tidak ikut dikirim. Menyambungkan Blob store dan mengisi variabel pada akun Vercel tetap diperlukan; pemeriksaan lokal tidak menggantikan deployment nyata pada akun tersebut.
 
@@ -128,7 +131,7 @@ Tes mencakup validasi input, login/logout, penolakan akses anonim/non-admin, dra
 
 ## Catatan operasional
 
-- Dengan `BLOB_READ_WRITE_TOKEN`, gambar disimpan dan dihapus melalui Vercel Blob. Tanpa token, server lokal memakai `public/uploads/projects` dan `public/uploads/profile`; mode disk lokal tidak diizinkan untuk upload di Vercel. Cadangkan folder upload lokal bersama database jika memakai host Node dengan disk persisten.
+- Dengan OIDC Vercel dan `BLOB_STORE_ID`, atau `BLOB_READ_WRITE_TOKEN`, gambar disimpan dan dihapus melalui Vercel Blob. Tanpa kredensial cloud, server lokal memakai `public/uploads/projects` dan `public/uploads/profile`; mode disk lokal tidak diizinkan untuk upload di Vercel. Cadangkan folder upload lokal bersama database jika memakai host Node dengan disk persisten.
 - Rate limiter saat ini berada di memori satu proses. Gunakan shared store seperti Redis jika menjalankan banyak instance.
 - Cadangkan PostgreSQL dan folder upload bersama. Jangan menjalankan seed lama yang menghapus database.
 - Build menjalankan pemeriksaan TypeScript; opsi lama `ignoreBuildErrors` sudah dihapus.

@@ -25,21 +25,16 @@ export default function ProjectGrid({
   );
   return (
     <div>
-      <div className="mb-9 flex flex-wrap items-center justify-between gap-5">
-        <div className="flex flex-wrap gap-2" aria-label="Filter projects">
+      <div className="project-toolbar">
+        <div className="project-filters" aria-label="Filter projects">
           {categories.map((item) => (
             <button
               key={item}
               onClick={() => setCategory(item)}
               aria-pressed={category === item}
-              className={`rounded-md border px-3 py-2 text-xs transition-colors ${category === item ? "border-[#37568d] bg-[#91a6df]/10 text-[#a6bfff]" : "border-[#263146] text-[#9ba6ba] hover:border-[#9ba6ba]"}`}
+              className="project-filter"
             >
               {item}
-              {item === "All projects" && (
-                <span className="ml-2 opacity-60">
-                  {projects.length.toString().padStart(2, "0")}
-                </span>
-              )}
             </button>
           ))}
         </div>
@@ -63,7 +58,7 @@ export default function ProjectGrid({
         {filtered.length} projects found
       </p>
       {filtered.length ? (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="project-grid">
           {filtered.map((project, index) => (
             <ProjectCard key={project.id} project={project} index={index} />
           ))}

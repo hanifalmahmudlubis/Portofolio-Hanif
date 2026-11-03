@@ -105,6 +105,7 @@ try {
     NEXTAUTH_SECRET: randomBytes(32).toString("hex"),
     BLOB_READ_WRITE_TOKEN: "",
     BLOB_STORE_ID: "",
+    VERCEL_OIDC_TOKEN: "",
     VERCEL: "",
     TEST_BASE_URL: baseUrl,
     TEST_ADMIN_EMAIL: "admin@portfolio.test",

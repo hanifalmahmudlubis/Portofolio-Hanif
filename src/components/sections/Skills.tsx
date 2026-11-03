@@ -1,5 +1,4 @@
 import Container from "../ui/Container";
-import Reveal from "../ui/Reveal";
 import SectionHeading from "../ui/SectionHeading";
 import type { Technology } from "@/types/project";
 const coreSkills = [
@@ -40,27 +39,38 @@ export default function Skills({
   const additional = technologies.filter(
     (item) => !known.has(item.name.toLowerCase()),
   );
-  const groups = [
-    ...coreSkills,
-    ...(additional.length
-      ? [
-          {
-            title: "Other technologies",
-            skills: additional.map((item) => item.name),
-          },
-        ]
-      : []),
-  ];
+  const groups = coreSkills.map((group) => ({
+    ...group,
+    skills: [...group.skills],
+  }));
+  const other: string[] = [];
+  for (const technology of additional) {
+    const category = technology.category.toLowerCase();
+    const group = /machine|\bai\b|data science/.test(category)
+      ? 3
+      : /mobile/.test(category)
+        ? 1
+        : /database/.test(category)
+          ? 2
+          : /network|automation/.test(category)
+            ? 4
+            : /web|framework|programming|language/.test(category)
+              ? 0
+              : /tool|design|version control/.test(category)
+                ? 5
+                : -1;
+    if (group >= 0) groups[group].skills.push(technology.name);
+    else other.push(technology.name);
+  }
+  if (other.length) groups.push({ title: "Other technologies", skills: other });
   return (
     <section id="skills" className="section">
       <Container>
-        <SectionHeading title="Technical skills" />
-        <div className="grid gap-x-14 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
-          {groups.map((group, index) => (
-            <Reveal key={group.title} delay={(index % 3) * 0.04}>
-              <h3 className="mb-4 text-sm font-medium text-[#c6cfde]">
-                {group.title}
-              </h3>
+        <SectionHeading title="Skills" from="up" />
+        <div className="skills-grid">
+          {groups.map((group) => (
+            <div key={group.title} className="skill-card">
+              <h3 className="skill-title">{group.title}</h3>
               <div className="flex flex-wrap gap-2">
                 {group.skills.map((skill) => (
                   <span key={skill} className="tag">
@@ -68,7 +78,7 @@ export default function Skills({
                   </span>
                 ))}
               </div>
-            </Reveal>
+            </div>
           ))}
         </div>
       </Container>
