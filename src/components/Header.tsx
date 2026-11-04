@@ -3,7 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Github, Linkedin, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { site } from "@/lib/site";
+import { initialPublicProfile } from "@/lib/site";
+import type { PublicProfile } from "@/types/cv";
 const menus = [
   ["Intro", "/#intro"],
   ["Projects", "/#projects"],
@@ -12,7 +13,20 @@ const menus = [
   ["Certificates", "/#certificates"],
   ["Contact", "/#contact"],
 ];
-export default function Header() {
+// A streamed or cached route can retain hidden markup with the same section IDs.
+function visibleElement(id: string) {
+  if (!id) return null;
+  return (
+    [...document.querySelectorAll<HTMLElement>(`#${CSS.escape(id)}`)].find(
+      (element) => element.getClientRects().length > 0,
+    ) || null
+  );
+}
+export default function Header({
+  profile = initialPublicProfile,
+}: {
+  profile?: PublicProfile;
+}) {
   const [open, setOpen] = useState(false);
   const [visibleSection, setVisibleSection] = useState("intro");
   const navigationFrame = useRef(0);
@@ -29,7 +43,7 @@ export default function Header() {
     setOpen(false);
     if (pathname !== "/") return;
     const id = href.split("#")[1];
-    const section = document.getElementById(id);
+    const section = visibleElement(id);
     if (!section) return;
     event.preventDefault();
     setVisibleSection(id);
@@ -47,7 +61,7 @@ export default function Header() {
   }
   useEffect(() => {
     if (pathname !== "/") return;
-    const section = document.getElementById(window.location.hash.slice(1));
+    const section = visibleElement(window.location.hash.slice(1));
     const frame = section
       ? requestAnimationFrame(() =>
           section.scrollIntoView({ block: "start", behavior: "instant" }),
@@ -76,7 +90,7 @@ export default function Header() {
     const update = () => {
       frame = 0;
       const sections = menus
-        .map(([, href]) => document.getElementById(href.split("#")[1]))
+        .map(([, href]) => visibleElement(href.split("#")[1]))
         .filter((section): section is HTMLElement => Boolean(section));
       if (!sections.length) return;
       let active = sections[0].id;
@@ -96,7 +110,7 @@ export default function Header() {
       if (!frame) frame = requestAnimationFrame(update);
     };
     const observer = new ResizeObserver(schedule);
-    const main = document.getElementById("main");
+    const main = visibleElement("main");
     if (main) observer.observe(main);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
@@ -127,9 +141,13 @@ export default function Header() {
       </a>
       <header className="site-header">
         <div className="container flex h-[76px] items-center justify-between gap-6">
-          <Link href="/" className="brand" aria-label="Hanif — home">
-            <span className="hidden sm:inline">Hanif Al Mahmud Lubis</span>
-            <span className="sm:hidden">Hanif</span>
+          <Link
+            href="/"
+            className="brand"
+            aria-label={`${profile.fullName.split(" ")[0]} — home`}
+          >
+            <span className="hidden sm:inline">{profile.fullName}</span>
+            <span className="sm:hidden">{profile.fullName.split(" ")[0]}</span>
           </Link>
           <nav
             aria-label="Main navigation"
@@ -149,7 +167,7 @@ export default function Header() {
           </nav>
           <div className="hidden items-center gap-4 lg:flex">
             <a
-              href={site.github}
+              href={profile.githubUrl || undefined}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
@@ -158,7 +176,7 @@ export default function Header() {
               <Github size={20} />
             </a>
             <a
-              href={site.linkedin}
+              href={profile.linkedinUrl || undefined}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"

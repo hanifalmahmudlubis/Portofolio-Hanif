@@ -3,6 +3,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import SessionGuard from "./SessionGuard";
 export default function AdminShell({
   children,
 }: {
@@ -41,27 +42,29 @@ export default function AdminShell({
       previousFocus?.focus();
     };
   }, [open]);
-  if (pathname === "/admin/login")
+  if (pathname === "/admin/login" || pathname === "/admin/session")
     return <div className="admin-shell">{children}</div>;
   return (
-    <div className="admin-shell">
-      <a href="#admin-content" className="skip-link">
-        Lewati navigasi
-      </a>
-      {open && (
-        <button
-          aria-label="Tutup navigasi admin"
-          className="fixed inset-0 z-40 bg-black/70 lg:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
-      <Sidebar open={open} close={() => setOpen(false)} />
-      <div className="admin-main">
-        <Header open={open} onMenu={() => setOpen(!open)} />
-        <main id="admin-content" className="admin-content">
-          {children}
-        </main>
+    <SessionGuard>
+      <div className="admin-shell">
+        <a href="#admin-content" className="skip-link">
+          Lewati navigasi
+        </a>
+        {open && (
+          <button
+            aria-label="Tutup navigasi admin"
+            className="fixed inset-0 z-40 bg-black/70 lg:hidden"
+            onClick={() => setOpen(false)}
+          />
+        )}
+        <Sidebar open={open} close={() => setOpen(false)} />
+        <div className="admin-main">
+          <Header open={open} onMenu={() => setOpen(!open)} />
+          <main id="admin-content" className="admin-content">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </SessionGuard>
   );
 }

@@ -9,6 +9,9 @@ export interface Technology {
   id: string;
   name: string;
   category: string;
+  skillGroup?: string | null;
+  skillOrder?: number;
+  showInSkills?: boolean;
 }
 export interface Project {
   id: string;
@@ -21,6 +24,7 @@ export interface Project {
   year: number;
   problem: string | null;
   solution: string | null;
+  cvHighlights?: string[];
   githubUrl: string | null;
   liveDemoUrl: string | null;
   published: boolean;
@@ -37,6 +41,8 @@ export interface Experience {
   startDate: string;
   endDate: string | null;
   description: string;
+  employmentType?: string | null;
+  responsibilities?: string[];
   images: { id: string; url: string }[];
 }
 export interface Certificate {
@@ -44,6 +50,7 @@ export interface Certificate {
   title: string;
   issuer: string;
   year: string;
+  issueDate?: string | null;
   credentialUrl: string | null;
 }
 export interface ContactMessage {

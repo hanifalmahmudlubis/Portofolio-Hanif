@@ -8,7 +8,7 @@ import Container from "@/components/ui/Container";
 import Reveal from "@/components/ui/Reveal";
 import ProjectSlider from "@/components/projects/ProjectSlider";
 import { getPublicProject } from "@/lib/services/portfolio";
-import { site } from "@/lib/site";
+import { getPublicProfile } from "@/lib/services/content";
 import { safeUrl } from "@/lib/urls";
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ slug: string }> };
@@ -20,13 +20,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 export default async function ProjectDetailPage({ params }: Props) {
-  const project = await getPublicProject((await params).slug);
+  const [project, profile] = await Promise.all([
+    getPublicProject((await params).slug),
+    getPublicProfile(),
+  ]);
   if (!project) notFound();
   const repository = safeUrl(project.githubUrl);
   const demo = safeUrl(project.liveDemoUrl);
   return (
     <>
-      <Header />
+      <Header profile={profile} />
       <main id="main" className="project-detail pb-24">
         <Container>
           <Reveal from="left" className="pb-10 pt-12 md:pt-16">
@@ -48,7 +51,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a
-                href={repository || site.github}
+                href={repository || profile.githubUrl || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="button button-primary"
@@ -68,7 +71,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                 </a>
               )}
               <a
-                href={site.linkedin}
+                href={profile.linkedinUrl || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="button button-secondary"
@@ -142,7 +145,7 @@ export default async function ProjectDetailPage({ params }: Props) {
           </Reveal>
         </Container>
       </main>
-      <Footer />
+      <Footer profile={profile} />
     </>
   );
 }

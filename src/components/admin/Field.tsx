@@ -1,17 +1,33 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import {
+  useId,
+  type InputHTMLAttributes,
+  type TextareaHTMLAttributes,
+} from "react";
 type Shared = { label: string; hint?: string };
 export function Field({
   label,
   hint,
   ...props
 }: Shared & InputHTMLAttributes<HTMLInputElement>) {
+  const generatedId = useId();
+  const id = props.id || generatedId;
   return (
-    <label className="field">
-      {label}
-      {props.required ? " *" : ""}
-      <input {...props} />
-      {hint && <small>{hint}</small>}
-    </label>
+    <div className="field">
+      <label htmlFor={id}>
+        {label}
+        {props.required ? " *" : ""}
+      </label>
+      <input
+        {...props}
+        id={id}
+        aria-describedby={
+          [props["aria-describedby"], hint ? `${id}-hint` : ""]
+            .filter(Boolean)
+            .join(" ") || undefined
+        }
+      />
+      {hint && <small id={`${id}-hint`}>{hint}</small>}
+    </div>
   );
 }
 export function Textarea({
@@ -19,13 +35,25 @@ export function Textarea({
   hint,
   ...props
 }: Shared & TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const generatedId = useId();
+  const id = props.id || generatedId;
   return (
-    <label className="field">
-      {label}
-      {props.required ? " *" : ""}
-      <textarea {...props} />
-      {hint && <small>{hint}</small>}
-    </label>
+    <div className="field">
+      <label htmlFor={id}>
+        {label}
+        {props.required ? " *" : ""}
+      </label>
+      <textarea
+        {...props}
+        id={id}
+        aria-describedby={
+          [props["aria-describedby"], hint ? `${id}-hint` : ""]
+            .filter(Boolean)
+            .join(" ") || undefined
+        }
+      />
+      {hint && <small id={`${id}-hint`}>{hint}</small>}
+    </div>
   );
 }
 export function FormSection({

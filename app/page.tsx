@@ -12,16 +12,16 @@ export default async function Home() {
   const data = await getPortfolio();
   return (
     <>
-      <Header />
+      <Header profile={data.profile} />
       <main id="main">
-        <Hero photoUrl={data.introImageUrl} />
+        <Hero photoUrl={data.introImageUrl} profile={data.profile} />
         <Projects projects={data.projects} />
         <Experience experiences={data.experiences} />
         <Skills technologies={data.technologies} />
         <Certificate certificates={data.certificates} />
-        <Contact />
+        <Contact profile={data.profile} />
       </main>
-      <Footer />
+      <Footer profile={data.profile} />
     </>
   );
 }

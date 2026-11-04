@@ -72,6 +72,13 @@ export default function CertificateForm({
             />
           </div>
           <Field
+            label="Bulan terbit"
+            name="issueDate"
+            type="month"
+            defaultValue={certificate?.issueDate || ""}
+            hint="Opsional, harus sesuai dengan tahun sertifikat. Kosongkan jika hanya tahunnya yang diketahui"
+          />
+          <Field
             label="URL kredensial"
             name="credentialUrl"
             type="url"

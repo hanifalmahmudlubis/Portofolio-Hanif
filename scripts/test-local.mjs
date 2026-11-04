@@ -6,6 +6,8 @@ import { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const root = process.cwd();
+const production = process.argv.includes("--production");
+const testArgs = process.argv.slice(2).filter((arg) => arg !== "--production");
 const bin =
   process.env.PG_BIN ||
   (process.platform === "win32"
@@ -108,6 +110,7 @@ try {
     VERCEL_OIDC_TOKEN: "",
     VERCEL: "",
     TEST_BASE_URL: baseUrl,
+    TEST_PRODUCTION_BUILD: production ? "1" : "",
     TEST_ADMIN_EMAIL: "admin@portfolio.test",
     TEST_ADMIN_PASSWORD: randomBytes(24).toString("hex"),
     TEST_PROFILE_ADMIN_EMAIL: "profile-admin@portfolio.test",
@@ -144,9 +147,11 @@ try {
       role: "VIEWER",
     },
   });
-  const technology = await db.technology.create({
-    data: { name: "Python", category: "Machine Learning" },
-  });
+  const technology =
+    (await db.technology.findFirst({ where: { name: "Python" } })) ??
+    (await db.technology.create({
+      data: { name: "Python", category: "Machine Learning" },
+    }));
   await db.project.create({
     data: {
       title: "SKTM Eligibility Recommendation System",
@@ -210,9 +215,19 @@ try {
   });
   await db.$disconnect();
   db = undefined;
+  if (production) {
+    console.log(
+      "Building and testing the production app on an isolated database.",
+    );
+    await run(
+      process.execPath,
+      ["node_modules/next/dist/bin/next", "build"],
+      env,
+    );
+  }
   await run(
     process.execPath,
-    ["node_modules/@playwright/test/cli.js", "test", ...process.argv.slice(2)],
+    ["node_modules/@playwright/test/cli.js", "test", ...testArgs],
     env,
   );
 } catch (error) {

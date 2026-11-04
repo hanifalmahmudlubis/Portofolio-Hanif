@@ -1,6 +1,7 @@
 import { ApiError } from "./api/errors";
 import { safeUrl } from "./urls";
 import { normalizeMonth } from "./dates";
+import { bulletInput } from "./cv-validation";
 type Input = Record<string, unknown>;
 function text(input: Input, key: string, required = true, max = 200): string {
   const value = input[key];
@@ -82,6 +83,7 @@ export function projectInput(input: Input) {
     year: integer(input, "year", 1990, 2100),
     problem: text(input, "problem", false, 10000) || null,
     solution: text(input, "solution", false, 10000) || null,
+    cvHighlights: bulletInput(input.cvHighlights, "cvHighlights"),
     githubUrl: url(input, "githubUrl"),
     liveDemoUrl: url(input, "liveDemoUrl"),
     published: flag(input, "published"),
@@ -119,14 +121,30 @@ export function experienceInput(input: Input) {
     startDate,
     endDate,
     description: text(input, "description", true, 10000),
+    employmentType:
+      input.employmentType === undefined
+        ? undefined
+        : text(input, "employmentType", false, 100) || null,
+    responsibilities: bulletInput(input.responsibilities, "responsibilities"),
     images,
   };
 }
 export function certificateInput(input: Input) {
+  const year = String(integer(input, "year", 1990, 2100));
+  const issueDate =
+    input.issueDate === undefined
+      ? undefined
+      : dateValue(input, "issueDate", false);
+  if (issueDate && !issueDate.startsWith(year + "-"))
+    throw new ApiError(
+      400,
+      "Bulan terbit harus sesuai dengan tahun sertifikat",
+    );
   return {
     title: text(input, "title"),
     issuer: text(input, "issuer"),
-    year: String(integer(input, "year", 1990, 2100)),
+    year,
+    issueDate,
     credentialUrl: url(input, "credentialUrl"),
   };
 }

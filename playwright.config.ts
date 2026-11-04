@@ -27,7 +27,7 @@ export default defineConfig({
         : {},
   },
   webServer: {
-    command: `node node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port ${new URL(process.env.TEST_BASE_URL || "http://127.0.0.1:3100").port}`,
+    command: `node node_modules/next/dist/bin/next ${process.env.TEST_PRODUCTION_BUILD === "1" ? "start" : "dev"} --hostname 127.0.0.1 --port ${new URL(process.env.TEST_BASE_URL || "http://127.0.0.1:3100").port}`,
     url: `${process.env.TEST_BASE_URL || "http://127.0.0.1:3100"}/admin/login`,
     reuseExistingServer: false,
     timeout: 180_000,

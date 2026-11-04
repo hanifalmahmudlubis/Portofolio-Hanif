@@ -5,13 +5,17 @@ import Container from "@/components/ui/Container";
 import Reveal from "@/components/ui/Reveal";
 import ProjectGrid from "@/components/projects/ProjectGrid";
 import { listProjects } from "@/lib/services/portfolio";
+import { getPublicProfile } from "@/lib/services/content";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Projects" };
 export default async function ProjectsPage() {
-  const projects = await listProjects();
+  const [projects, profile] = await Promise.all([
+    listProjects(),
+    getPublicProfile(),
+  ]);
   return (
     <>
-      <Header />
+      <Header profile={profile} />
       <main id="main" className="pb-24">
         <Container>
           <Reveal from="down" className="archive-heading">
@@ -25,7 +29,7 @@ export default async function ProjectsPage() {
           <ProjectGrid projects={projects} searchable />
         </Container>
       </main>
-      <Footer />
+      <Footer profile={profile} />
     </>
   );
 }

@@ -43,6 +43,8 @@ Rujukan: [Vercel server uploads](https://vercel.com/docs/vercel-blob/server-uplo
 
 ## Alur fitur
 
+- **CV khusus admin** tersedia di `/admin/cv`: editor profil, pendidikan, keterampilan, pilihan konten, pratinjau, dan unduh PDF dinamis. CV memakai sumber data yang sama dengan portofolio. Pengunjung tidak mendapat tombol atau akses unduh CV. Lihat [rancangan, penggunaan, dan deployment CV](docs/cv-builder.md). Terapkan migrasi terbaru dengan `npm run db:migrate` sebelum menjalankan versi ini.
+
 - Proyek dan sertifikat diurutkan dari tahun terbaru. Pengalaman yang masih berjalan berada paling atas, diikuti tanggal selesai dan mulai terbaru; format lama seperti `Sep 2024` tetap diurutkan dengan benar. Daftar admin dan API menggunakan urutan yang sama.
 - Foto intro dapat diganti melalui **Admin → Foto intro** (`/admin/profile`), lengkap dengan pratinjau dan opsi menggunakan foto awal. Upload memakai Vercel Blob bila token tersedia, atau disk lokal saat development. Foto lama dibersihkan setelah penggantian jika tidak lagi dipakai oleh pengaturan, proyek, atau pengalaman.
 - Header menandai bagian yang sedang terlihat saat scroll, termasuk tautan langsung ke section dan menu mobile. Halaman daftar/detail proyek menandai menu Projects.
@@ -65,12 +67,27 @@ src/lib/validation.ts      Validasi payload sebelum menyentuh database
 src/lib/api/errors.ts      Respons error yang konsisten
 src/lib/admin.ts           Verifikasi sesi dan role admin dari database
 src/lib/auth.ts            Login credentials + sesi JWT
+src/lib/admin-session.ts   Batas sesi tidak aktif dan batas sejak login
 src/lib/uploads.ts         Validasi dan penyimpanan berkas gambar
 src/lib/api-client.ts      Pemanggilan API dari form dan interaksi browser
 src/types/                 Tipe data antarkomponen
 ```
 
 Server Components memakai layanan data yang sama dengan API agar tidak membuat request HTTP ke server sendiri. Semua perubahan dari browser masuk melalui API. Relasi memakai nested writes/transaction Prisma; referential cascade mengikuti schema yang sudah ada. Setiap mutasi memperbarui halaman publik dan admin.
+
+### Sesi admin
+
+Sesi berakhir setelah **15 menit tanpa aktivitas** atau **1 jam sejak login**, mana yang tercapai lebih dahulu. Waktu login awal dan aktivitas terakhir ditetapkan oleh server di dalam JWT terenkripsi. Aktivitas hanya memperbarui batas tidak aktif; membaca sesi, polling, dan permintaan pembaruan setelah kedaluwarsa tidak memperpanjang sesi. Tanggal, identitas, serta role yang dikirim browser tidak digunakan untuk mengubah klaim tersebut.
+
+Admin mendapat peringatan satu menit sebelum sesi berakhir. Aktivitas mouse, keyboard, sentuhan, pengisian form, dan scroll pada halaman admin memperbarui sesi paling sering setiap 30 detik; polling pasif tidak dihitung sebagai aktivitas. Pembaruan sesi memakai endpoint NextAuth dengan perlindungan CSRF dan disinkronkan antar-tab. Form yang masih terbuka tetap terpasang selama pembaruan sesi. Setelah batas tercapai, halaman kembali ke login dan server menolak akses API admin.
+
+Login yang berhasil mereset penghitung percobaan akun tersebut. Batas percobaan gagal tetap 10 per 15 menit, dengan penyimpanan dalam memori per proses sebagaimana catatan operasional. Revisi sesi tidak membutuhkan migrasi database atau environment variable baru. Cookie sesi dari versi lama yang belum memiliki penanda waktu akan memerlukan login ulang setelah deployment.
+
+Jika browser masih gagal membuat sesi, buka **Hapus sesi browser** pada halaman login atau langsung kunjungi `/admin/session`. Halaman ini tersedia tanpa login dan juga dapat dibuka dari menu admin. Tombol **Hapus sesi browser ini** membersihkan cookie NextAuth, termasuk token sesi yang terpotong menjadi beberapa cookie, CSRF, serta callback lama. Cookie lain dan konten portofolio tidak diubah. Tab lain pada browser yang sama mendapat pembaruan status, lalu halaman login dapat digunakan kembali. Fitur ini tidak menampilkan atau mengakhiri sesi perangkat lain.
+
+Endpoint `POST /api/auth/reset-session` tidak membutuhkan sesi aktif atau koneksi database. Endpoint mewajibkan origin yang diizinkan dan header khusus dari aplikasi, menolak permintaan lintas situs, dan tidak menerima perintah untuk mengubah akun atau menghapus batas percobaan login. GET tidak menghapus apa pun. Menghapus cookie tidak membuka blokir percobaan gagal dan tidak mengganti password.
+
+Pesan login sekarang membedakan kredensial salah, pembatasan percobaan, dan sesi yang belum berhasil dibuat. Sesudah kredensial diterima, aplikasi memeriksa sesi ADMIN yang benar-benar terbentuk sebelum membuka dashboard. Tujuan navigasi selalu `/admin/dashboard` pada origin yang sedang dibuka; URL callback pada konfigurasi lain tidak lagi membuat keberhasilan login dilaporkan sebagai password salah, dan tidak dipakai untuk mengalihkan pengguna ke domain lain.
 
 ## Kontrak API
 
@@ -99,6 +116,7 @@ Status utama: `400` validasi, `401` sesi admin tidak valid, `403` origin tidak d
 | `/api/admin/messages/:id`  | PATCH / DELETE        | Admin: ubah isRead / hapus                                             |
 | `/api/admin/dashboard`     | GET                   | Admin: statistik dan proyek terbaru                                    |
 | `/api/admin/profile`       | GET / POST / DELETE   | Admin: foto intro saat ini / upload satu gambar / kembali ke foto awal |
+| `/api/auth/reset-session`  | POST                  | Hapus cookie sesi browser sendiri; origin dan header khusus wajib     |
 
 Contoh membaca data dari browser:
 

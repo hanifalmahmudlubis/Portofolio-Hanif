@@ -1,7 +1,7 @@
 import { ApiError } from "./error";
 /** Bound streamed requests too: Content-Length alone is not a reliable limit. */
 export async function readBody(
-  request: Request,
+  request: Pick<Request, "headers" | "body">,
   limit: number,
 ): Promise<ArrayBuffer> {
   if (Number(request.headers.get("content-length")) > limit)

@@ -15,17 +15,22 @@ test("an upload failure preserves the saved project and retry does not duplicate
     } else await route.continue();
   });
   await page.goto("/admin/projects/new");
-  await page.getByLabel("Judul proyek").fill("Recoverable upload project");
   await page
-    .getByLabel("Kategori", { exact: false })
-    .first()
+    .getByRole("textbox", { name: /^Judul proyek/ })
+    .fill("Recoverable upload project");
+  await page
+    .getByRole("combobox", { name: "Kategori *", exact: true })
     .fill("Web Development");
-  await page.getByLabel("Jenis proyek").fill("Personal Project");
-  await page.getByLabel("Ringkasan").fill("Upload retry test.");
   await page
-    .getByLabel("Deskripsi lengkap")
+    .getByRole("textbox", { name: "Jenis proyek *", exact: true })
+    .fill("Personal Project");
+  await page
+    .getByRole("textbox", { name: "Ringkasan *", exact: true })
+    .fill("Upload retry test.");
+  await page
+    .getByRole("textbox", { name: "Deskripsi lengkap *", exact: true })
     .fill("A failed upload must not create duplicate projects.");
-  await page.locator('input[type="file"]').setInputFiles([
+  await page.locator('input[type="file"]:visible').setInputFiles([
     { name: "first-success.png", mimeType: "image/png", buffer: png },
     {
       name: "broken.png",
@@ -123,10 +128,11 @@ test("desktop public pages render, filter projects and link to the requested pro
     "certificates",
     "contact",
   ])
-    await expect(page.locator(`#${id}`)).toBeAttached();
+    await expect(page.getByRole("main").locator(`#${id}`)).toBeAttached();
   expect(
     await page
-      .locator("main > section")
+      .getByRole("main")
+      .locator(":scope > section")
       .evaluateAll((sections) => sections.map((section) => section.id)),
   ).toEqual([
     "intro",
@@ -353,12 +359,22 @@ test("experience and certificate admin forms create, update and delete without n
 }) => {
   await signInUi(page);
   await page.goto("/admin/experience/new");
-  await page.getByLabel("Posisi / jabatan").fill("UI test engineer");
-  await page.getByLabel("Perusahaan / organisasi").fill("UI test company");
-  await page.getByLabel("Mulai", { exact: false }).fill("2025-01");
-  await page.getByLabel("Selesai", { exact: false }).fill("2025-03");
   await page
-    .getByLabel("Deskripsi & kontribusi")
+    .getByRole("textbox", { name: /^Posisi \/ jabatan/ })
+    .fill("UI test engineer");
+  await page
+    .getByRole("textbox", { name: /^Perusahaan \/ organisasi/ })
+    .fill("UI test company");
+  await page
+    .getByLabel("Mulai", { exact: false })
+    .filter({ visible: true })
+    .fill("2025-01");
+  await page
+    .getByLabel("Selesai", { exact: false })
+    .filter({ visible: true })
+    .fill("2025-03");
+  await page
+    .getByRole("textbox", { name: /^Deskripsi & kontribusi/ })
     .fill("A complete form submission.");
   await page.getByRole("button", { name: "Simpan pengalaman" }).click();
   await expect(page).toHaveURL(/\/admin\/experience\?saved=1/);
@@ -367,10 +383,12 @@ test("experience and certificate admin forms create, update and delete without n
     .filter({ hasText: "UI test engineer" })
     .getByRole("link", { name: "Edit", exact: true })
     .click();
-  await expect(page.getByLabel("Mulai", { exact: false })).toHaveValue(
-    "2025-01",
-  );
-  await page.getByLabel("Posisi / jabatan").fill("Updated UI engineer");
+  await expect(
+    page.getByLabel("Mulai", { exact: false }).filter({ visible: true }),
+  ).toHaveValue("2025-01");
+  await page
+    .getByRole("textbox", { name: /^Posisi \/ jabatan/ })
+    .fill("Updated UI engineer");
   await page.getByRole("button", { name: "Simpan pengalaman" }).click();
   await page.getByRole("button", { name: "Hapus Updated UI engineer" }).click();
   await page.getByRole("button", { name: "Ya, hapus", exact: true }).click();
@@ -378,8 +396,10 @@ test("experience and certificate admin forms create, update and delete without n
     page.getByRole("row").filter({ hasText: "Updated UI engineer" }),
   ).toHaveCount(0);
   await page.goto("/admin/certificate/new");
-  await page.getByLabel("Judul sertifikat").fill("UI test certificate");
-  await page.getByLabel("Penerbit").fill("UI test issuer");
+  await page
+    .getByRole("textbox", { name: /^Judul sertifikat/ })
+    .fill("UI test certificate");
+  await page.getByRole("textbox", { name: /^Penerbit/ }).fill("UI test issuer");
   await page.getByRole("button", { name: "Simpan sertifikat" }).click();
   await expect(page).toHaveURL(/\/admin\/certificate\?saved=1/);
   await page
@@ -387,7 +407,9 @@ test("experience and certificate admin forms create, update and delete without n
     .filter({ hasText: "UI test certificate" })
     .getByRole("link", { name: "Edit", exact: true })
     .click();
-  await page.getByLabel("Judul sertifikat").fill("Updated UI certificate");
+  await page
+    .getByRole("textbox", { name: /^Judul sertifikat/ })
+    .fill("Updated UI certificate");
   await page.getByRole("button", { name: "Simpan sertifikat" }).click();
   await page
     .getByRole("button", { name: "Hapus Updated UI certificate" })
@@ -411,7 +433,9 @@ test("mobile admin navigation and sign out work; login displays invalid credenti
   await page.getByLabel("Email admin").fill("unknown@example.com");
   await page.getByLabel("Password", { exact: true }).fill("invalid-password");
   await page.getByRole("button", { name: "Masuk" }).click();
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Email atau password" }),
+  ).toBeVisible();
   await signInUi(page);
   expect(
     await page.evaluate(

@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -20,6 +20,11 @@ model User {
 model SiteSettings {
   id            String   @id
   introImageUrl String?
+  profile       Json?
+  education     Json?
+  softSkills    Json?
+  languages     Json?
+  cvPreferences Json?
   updatedAt     DateTime @default(now()) @updatedAt
 }
 
@@ -34,6 +39,7 @@ model Project {
   year             Int
   problem          String?
   solution         String?
+  cvHighlights     String[]            @default([])
   githubUrl        String?
   liveDemoUrl      String?
   featured         Boolean             @default(false)
@@ -63,11 +69,14 @@ model ProjectImage {
 }
 
 model Technology {
-  id       String              @id @default(cuid())
-  name     String
-  icon     String?
-  category String
-  projects ProjectTechnology[]
+  id           String              @id @default(cuid())
+  name         String
+  icon         String?
+  category     String
+  skillGroup   String?
+  skillOrder   Int                 @default(1000)
+  showInSkills Boolean             @default(true)
+  projects     ProjectTechnology[]
 }
 
 model ProjectTechnology {
@@ -80,16 +89,18 @@ model ProjectTechnology {
 }
 
 model Experience {
-  id          String            @id @default(cuid())
-  company     String
-  position    String
-  location    String?
-  startDate   String
-  endDate     String?
-  description String
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  images      ExperienceImage[]
+  id               String            @id @default(cuid())
+  company          String
+  position         String
+  location         String?
+  startDate        String
+  endDate          String?
+  description      String
+  employmentType   String?
+  responsibilities String[]          @default([])
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  images           ExperienceImage[]
 }
 
 model ExperienceImage {
@@ -106,6 +117,7 @@ model Certificate {
   title         String
   issuer        String
   year          String
+  issueDate     String?
   credentialUrl String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

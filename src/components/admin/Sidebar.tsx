@@ -12,14 +12,18 @@ import {
   ArrowUpRight,
   X,
   UserRound,
+  FileText,
+  ShieldCheck,
 } from "lucide-react";
 const navigation = [
   { title: "Ringkasan", href: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Foto intro", href: "/admin/profile", icon: UserRound },
+  { title: "CV", href: "/admin/cv", icon: FileText },
   { title: "Proyek", href: "/admin/projects", icon: FolderKanban },
   { title: "Pengalaman", href: "/admin/experience", icon: Briefcase },
   { title: "Sertifikat", href: "/admin/certificate", icon: Award },
   { title: "Pesan masuk", href: "/admin/messages", icon: MessageSquare },
+  { title: "Sesi browser", href: "/admin/session", icon: ShieldCheck },
 ];
 export default function Sidebar({
   open,

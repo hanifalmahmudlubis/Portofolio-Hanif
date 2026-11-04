@@ -2,12 +2,16 @@ import Image from "next/image";
 import { ArrowUpRight, Github, Linkedin } from "lucide-react";
 import Container from "../ui/Container";
 import Reveal from "../ui/Reveal";
-import { DEFAULT_INTRO_IMAGE, site } from "@/lib/site";
+import { DEFAULT_INTRO_IMAGE, initialPublicProfile } from "@/lib/site";
+import type { PublicProfile } from "@/types/cv";
 export default function Hero({
   photoUrl = DEFAULT_INTRO_IMAGE,
+  profile = initialPublicProfile,
 }: {
   photoUrl?: string;
+  profile?: PublicProfile;
 }) {
+  const words = profile.fullName.split(/\s+/);
   return (
     <section id="intro" className="hero-section">
       <Container className="relative">
@@ -15,7 +19,7 @@ export default function Hero({
           <div className="hero-copy">
             <h1 className="hero-title">
               <Reveal as="span" from="left" delay={0.08} repeat>
-                Hanif Al
+                {words.slice(0, 2).join(" ")}
               </Reveal>{" "}
               <Reveal
                 as="span"
@@ -24,18 +28,15 @@ export default function Hero({
                 repeat
                 className="hero-name-accent"
               >
-                Mahmud Lubis
+                {words.slice(2).join(" ")}
               </Reveal>
             </h1>
             <Reveal from="up" delay={0.32}>
-              <p className="hero-role">Software Engineering Graduate</p>
+              <p className="hero-role">{profile.professionalTitle}</p>
             </Reveal>
             <p className="hero-description">
-              Building practical solutions through web, mobile, and machine
-              learning
-              <span className="block mt-3">
-                A graduate of Politeknik Negeri Medan
-              </span>
+              {profile.shortBio}
+              <span className="block mt-3">{profile.educationLine}</span>
             </p>
             <Reveal from="fade" delay={0.4} className="hero-actions">
               <a href="#projects" className="button button-primary">
@@ -47,7 +48,7 @@ export default function Hero({
             </Reveal>
             <div className="hero-socials">
               <a
-                href={site.github}
+                href={profile.githubUrl || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub repositories"
@@ -57,7 +58,7 @@ export default function Hero({
                 GitHub
               </a>
               <a
-                href={site.linkedin}
+                href={profile.linkedinUrl || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn profile"
@@ -73,14 +74,14 @@ export default function Hero({
               <div className="hero-portrait">
                 <Image
                   src={photoUrl}
-                  alt="Hanif Al Mahmud Lubis"
+                  alt={profile.fullName}
                   fill
                   preload
                   sizes="(max-width: 767px) 320px, (max-width: 1023px) 300px, 380px"
                 />
               </div>
               <div className="portrait-caption">
-                <span>Medan, Indonesia</span>
+                <span>{profile.location}</span>
               </div>
             </div>
           </Reveal>

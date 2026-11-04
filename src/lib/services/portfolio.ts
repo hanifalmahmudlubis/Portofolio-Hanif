@@ -11,6 +11,7 @@ import {
 import { removeUpload } from "../uploads";
 import { compareExperienceDates } from "../dates";
 import { getIntroImage } from "./profile";
+import { getPublicProfile } from "./content";
 
 export const projectInclude = {
   images: {
@@ -51,22 +52,40 @@ export const listExperiences = async () =>
   ).sort(compareExperienceDates);
 export const listCertificates = () =>
   prisma.certificate.findMany({
-    orderBy: [{ year: "desc" }, { createdAt: "desc" }],
+    orderBy: [
+      { year: "desc" },
+      { issueDate: { sort: "desc", nulls: "last" } },
+      { createdAt: "desc" },
+    ],
   });
 export const listTechnologies = () =>
   prisma.technology.findMany({
     orderBy: [{ category: "asc" }, { name: "asc" }],
   });
 export const getPortfolio = async () => {
-  const [projects, experiences, certificates, technologies, introImageUrl] =
-    await Promise.all([
-      listProjects(),
-      listExperiences(),
-      listCertificates(),
-      listTechnologies(),
-      getIntroImage(),
-    ]);
-  return { projects, experiences, certificates, technologies, introImageUrl };
+  const [
+    projects,
+    experiences,
+    certificates,
+    technologies,
+    introImageUrl,
+    profile,
+  ] = await Promise.all([
+    listProjects(),
+    listExperiences(),
+    listCertificates(),
+    listTechnologies(),
+    getIntroImage(),
+    getPublicProfile(),
+  ]);
+  return {
+    projects,
+    experiences,
+    certificates,
+    technologies,
+    introImageUrl,
+    profile,
+  };
 };
 export async function saveProject(body: Record<string, unknown>, id?: string) {
   const { technologyIds, ...data } = projectInput(body);

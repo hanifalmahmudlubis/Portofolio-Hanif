@@ -7,6 +7,7 @@ import type { Experience } from "@/types/project";
 import { api, errorMessage } from "@/lib/api-client";
 import { toMonthInput } from "@/lib/site";
 import { Field, Textarea, FormSection } from "./Field";
+import CvPointsField from "./CvPointsField";
 export default function ExperienceForm({
   experience,
 }: {
@@ -27,6 +28,10 @@ export default function ExperienceForm({
           method: experience ? "PUT" : "POST",
           body: JSON.stringify({
             ...data,
+            responsibilities: String(data.responsibilities || "")
+              .split(/\r?\n/)
+              .map((line) => line.trim())
+              .filter(Boolean),
             images: String(data.images || "")
               .split("\n")
               .map((url) => url.trim())
@@ -78,6 +83,13 @@ export default function ExperienceForm({
             defaultValue={experience?.location || ""}
             placeholder="Medan, Indonesia"
           />
+          <Field
+            label="Jenis pekerjaan"
+            name="employmentType"
+            maxLength={100}
+            defaultValue={experience?.employmentType || ""}
+            placeholder="Internship / Full-time"
+          />
           <div className="grid gap-5 sm:grid-cols-2">
             <Field
               label="Mulai"
@@ -101,6 +113,11 @@ export default function ExperienceForm({
             maxLength={10000}
             rows={6}
             defaultValue={experience?.description}
+          />
+          <CvPointsField
+            label="Poin tanggung jawab untuk CV"
+            name="responsibilities"
+            initial={experience?.responsibilities}
           />
         </FormSection>
         <FormSection title="Dokumentasi">

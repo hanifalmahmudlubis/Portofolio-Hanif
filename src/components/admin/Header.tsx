@@ -5,6 +5,7 @@ import { Menu, ArrowUpRight } from "lucide-react";
 const names: Record<string, string> = {
   dashboard: "Ringkasan",
   profile: "Foto intro",
+  cv: "CV",
   projects: "Proyek",
   experience: "Pengalaman",
   certificate: "Sertifikat",

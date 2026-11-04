@@ -10,6 +10,7 @@ import { imageUrl } from "@/lib/urls";
 import { MAX_IMAGE_SIZE, MAX_UPLOAD_COUNT } from "@/lib/upload-config";
 import { Field, Textarea, FormSection } from "./Field";
 import DeleteButton from "./DeleteButton";
+import CvPointsField from "./CvPointsField";
 export default function ProjectForm({
   project,
   technologies: initialTechnologies,
@@ -100,6 +101,10 @@ export default function ProjectForm({
       published: form.has("published"),
       featured: form.has("featured"),
       technologyIds: selected,
+      cvHighlights: String(form.get("cvHighlights") || "")
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean),
     };
     try {
       const result = await api<Project>(
@@ -247,6 +252,11 @@ export default function ProjectForm({
               maxLength={10000}
               rows={3}
               defaultValue={project?.solution || ""}
+            />
+            <CvPointsField
+              label="Poin kontribusi untuk CV"
+              name="cvHighlights"
+              initial={project?.cvHighlights}
             />
           </FormSection>
           <FormSection

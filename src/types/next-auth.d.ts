@@ -2,11 +2,15 @@ import { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
   interface Session {
-    user: {
+    user?: {
       id: string;
 
       role: string;
     } & DefaultSession["user"];
+    error?: "SessionExpired";
+    serverTime?: number;
+    idleExpiresAt?: number;
+    absoluteExpiresAt?: number;
   }
 
   interface User {
@@ -21,5 +25,7 @@ declare module "next-auth/jwt" {
     id?: string;
 
     role?: string;
+    signedInAt?: number;
+    lastActiveAt?: number;
   }
 }

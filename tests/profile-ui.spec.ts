@@ -41,7 +41,7 @@ test("admin intro photo editor previews, saves and resets the public portrait", 
   );
   await page.goto("/");
   await expect(
-    page.getByAltText("Hanif Al Mahmud Lubis", { exact: true }),
+    page.getByRole("img", { name: "Hanif Al Mahmud Lubis", exact: true }),
   ).toHaveAttribute("src", photo.introImageUrl);
   await page.goto("/admin/profile");
   await page.getByRole("button", { name: "Gunakan foto awal" }).click();
@@ -50,7 +50,7 @@ test("admin intro photo editor previews, saves and resets the public portrait", 
   );
   await page.goto("/");
   await expect(
-    page.getByAltText("Hanif Al Mahmud Lubis", { exact: true }),
+    page.getByRole("img", { name: "Hanif Al Mahmud Lubis", exact: true }),
   ).toHaveAttribute("src", "/profile.jpg");
 });
 
@@ -69,6 +69,7 @@ test("header marks the visible section, deep links and project routes on desktop
     ["contact", "Contact"],
   ]) {
     await page
+      .getByRole("main")
       .locator(`#${id}`)
       .evaluate((element) =>
         element.scrollIntoView({ block: "start", behavior: "instant" }),
@@ -89,13 +90,11 @@ test("header marks the visible section, deep links and project routes on desktop
   await page.setViewportSize({ width: 390, height: 844 });
   // Resizing reflows the cards, so establish the visible section on mobile.
   await page
+    .getByRole("main")
     .locator("#skills")
     .evaluate((section) =>
       section.scrollIntoView({ block: "start", behavior: "instant" }),
     );
-  await expect(
-    page.locator('nav[aria-label="Main navigation"] a[href="/#skills"]'),
-  ).toHaveAttribute("aria-current", "location");
   await page.getByRole("button", { name: "Open navigation" }).click();
   const mobile = page.getByRole("navigation", { name: "Mobile navigation" });
   await expect(

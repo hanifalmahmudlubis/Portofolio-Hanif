@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { authOptions } from "./auth";
 import { prisma } from "./prisma";
 import { ApiError } from "./api/errors";
+import { checkOrigin } from "./api/origin";
+export { checkOrigin } from "./api/origin";
 
 export const getAdmin = cache(async () => {
   const session = await getServerSession(authOptions);
@@ -18,14 +20,6 @@ export async function requireAdminPage() {
   const user = await getAdmin();
   if (!user) redirect("/admin/login");
   return user;
-}
-export function checkOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  const allowed = new Set([new URL(request.url).origin]);
-  if (process.env.NEXTAUTH_URL)
-    allowed.add(new URL(process.env.NEXTAUTH_URL).origin);
-  if (origin && !allowed.has(origin))
-    throw new ApiError(403, "Asal permintaan tidak diizinkan.");
 }
 export async function requireAdmin(request?: Request) {
   if (request && !["GET", "HEAD"].includes(request.method))

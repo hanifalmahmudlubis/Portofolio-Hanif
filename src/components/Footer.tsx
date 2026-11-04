@@ -1,19 +1,24 @@
 import Link from "next/link";
 import Container from "./ui/Container";
 import Reveal from "./ui/Reveal";
-import { site } from "@/lib/site";
+import { initialPublicProfile } from "@/lib/site";
+import type { PublicProfile } from "@/types/cv";
 import { ArrowUp } from "lucide-react";
-export default function Footer() {
+export default function Footer({
+  profile = initialPublicProfile,
+}: {
+  profile?: PublicProfile;
+}) {
   return (
     <footer className="site-footer">
       <Container>
         <Reveal className="flex flex-wrap items-center justify-between gap-5">
           <p className="text-xs text-[#8996ad]">
-            © {new Date().getFullYear()} {site.name}
+            © {new Date().getFullYear()} {profile.fullName}
           </p>
           <div className="flex gap-6 text-xs text-[#9ba6ba]">
             <a
-              href={site.github}
+              href={profile.githubUrl || undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary"
@@ -21,7 +26,7 @@ export default function Footer() {
               GitHub
             </a>
             <a
-              href={site.linkedin}
+              href={profile.linkedinUrl || undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary"

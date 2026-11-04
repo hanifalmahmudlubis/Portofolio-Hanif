@@ -3,9 +3,14 @@ import { useState } from "react";
 import Container from "../ui/Container";
 import Reveal from "../ui/Reveal";
 import { api, errorMessage } from "@/lib/api-client";
-import { site } from "@/lib/site";
+import { initialPublicProfile } from "@/lib/site";
+import type { PublicProfile } from "@/types/cv";
 import { Github, Linkedin } from "lucide-react";
-export default function Contact() {
+export default function Contact({
+  profile = initialPublicProfile,
+}: {
+  profile?: PublicProfile;
+}) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
@@ -36,12 +41,12 @@ export default function Contact() {
             <p className="contact-description">
               For projects and work opportunities
             </p>
-            <a href={`mailto:${site.email}`} className="contact-email">
-              <span>{site.email}</span>
+            <a href={`mailto:${profile.email}`} className="contact-email">
+              <span>{profile.email}</span>
             </a>
             <div className="contact-socials">
               <a
-                href={site.github}
+                href={profile.githubUrl || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="social-link"
@@ -49,7 +54,7 @@ export default function Contact() {
                 <Github size={17} /> GitHub
               </a>
               <a
-                href={site.linkedin}
+                href={profile.linkedinUrl || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="social-link"

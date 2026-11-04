@@ -13,7 +13,7 @@
     "postinstall": "prisma generate",
     "typecheck": "tsc --noEmit",
     "check:deploy": "node --env-file-if-exists=.env scripts/check-deploy.mjs",
-    "test": "node --import tsx --test tests/validation.test.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
     "test:integration": "node scripts/test-local.mjs",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "node --env-file=.env --import tsx prisma/seed.ts",
@@ -21,14 +21,17 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "@react-pdf/renderer": "4.9.0",
     "@vercel/blob": "2.4.0",
     "bcrypt": "^6.0.0",
     "framer-motion": "^13.2.0",
     "lucide-react": "^0.511.0",
     "next": "16.4.3",
     "next-auth": "^4.24.15",
+    "pdfjs-dist": "6.5.438",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
