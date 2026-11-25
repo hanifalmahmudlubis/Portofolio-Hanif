@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Fx3D from "@/components/ui/Fx3D";
 import Hero from "@/components/sections/Hero";
 import Projects from "@/components/sections/Projects";
 import Experience from "@/components/sections/Experience";
@@ -12,6 +13,7 @@ export default async function Home() {
   const data = await getPortfolio();
   return (
     <>
+      <Fx3D />
       <Header profile={data.profile} />
       <main id="main">
         <Hero photoUrl={data.introImageUrl} profile={data.profile} />

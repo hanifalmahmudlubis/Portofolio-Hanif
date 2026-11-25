@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowUpRight, Github, Linkedin } from "lucide-react";
 import Container from "../ui/Container";
 import Reveal from "../ui/Reveal";
+import Orb3D from "../ui/Orb3D";
 import { DEFAULT_INTRO_IMAGE, initialPublicProfile } from "@/lib/site";
 import type { PublicProfile } from "@/types/cv";
 export default function Hero({
@@ -14,6 +15,7 @@ export default function Hero({
   const words = profile.fullName.split(/\s+/);
   return (
     <section id="intro" className="hero-section">
+      <div className="hero-floor" aria-hidden="true" />
       <Container className="relative">
         <div className="hero-grid">
           <div className="hero-copy">
@@ -70,6 +72,7 @@ export default function Hero({
             </div>
           </div>
           <Reveal from="fade" delay={0.24} className="hero-photo-wrap">
+            <Orb3D />
             <div className="portrait-frame">
               <div className="hero-portrait">
                 <Image
