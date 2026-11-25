@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AdminShell from "@/components/admin/Shell";
+import "./admin.css";
 export const metadata: Metadata = {
   title: "Portfolio Studio",
   robots: { index: false, follow: false },

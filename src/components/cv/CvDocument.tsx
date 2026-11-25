@@ -24,29 +24,30 @@ const styles = StyleSheet.create({
     color: "#111111",
   },
   header: { position: "relative", justifyContent: "center", marginBottom: 2 },
-  headerWithPhoto: { minHeight: 90 },
+  headerWithPhoto: { minHeight: 100 },
   headerText: { width: "100%", textAlign: "center" },
-  headerTextWithPhoto: { paddingHorizontal: 82 },
+  headerTextWithPhoto: { paddingHorizontal: 92 },
   name: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 18,
-    marginBottom: 4,
+    fontSize: 20,
+    lineHeight: 1.15,
+    marginBottom: 7,
     textAlign: "center",
   },
   contact: {
-    fontSize: 9.5,
-    color: "#666666",
+    fontSize: 10,
+    color: "#7a7a7a",
     marginBottom: 2,
     textAlign: "center",
   },
-  link: { fontSize: 9.5, color: "#1753a6", textDecoration: "underline" },
+  link: { fontSize: 10, color: "#1a0dab", textDecoration: "underline" },
   headerLinks: { textAlign: "center" },
   photo: {
     position: "absolute",
     left: 0,
     top: 0,
-    width: 70,
-    height: 90,
+    width: 78,
+    height: 100,
     objectFit: "cover",
   },
   section: {
@@ -67,14 +68,16 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   heading: { width: contentWidth - 123, fontFamily: "Helvetica-Bold" },
-  muted: { fontFamily: "Helvetica", color: "#777777" },
+  muted: { fontFamily: "Helvetica-Bold", color: "#8c8c8c" },
+  type: { fontFamily: "Helvetica", color: "#8c8c8c" },
   date: { width: 113, flexShrink: 0, textAlign: "right", fontSize: 10 },
-  italic: { fontFamily: "Helvetica-Oblique", marginTop: 1, marginBottom: 3 },
+  italic: { fontFamily: "Helvetica-Oblique", marginTop: 1, marginBottom: 2 },
   item: { marginBottom: 6 },
   bullet: { flexDirection: "row", paddingLeft: 3, marginBottom: 1 },
   bulletDot: { width: 12, flexShrink: 0 },
   bulletText: { width: contentWidth - 15 },
-  tech: { fontSize: 10, color: "#666666", marginTop: 1, marginBottom: 3 },
+  tech: { color: "#8c8c8c", marginTop: 1, marginBottom: 3 },
+  label: { fontFamily: "Helvetica-Bold", marginBottom: 2 },
   skill: { marginBottom: 4 },
   bold: { fontFamily: "Helvetica-Bold" },
 });
@@ -96,7 +99,7 @@ function Bullets({ items }: { items: string[] }) {
   ));
 }
 function period(start: string, end: string | null) {
-  return `${formatMonth(start)} – ${end ? formatMonth(end) : "Present"}`;
+  return `${formatMonth(start)} - ${end ? formatMonth(end) : "Now"}`;
 }
 const visibleUrl = (value: string) => {
   const url = new URL(value);
@@ -211,7 +214,7 @@ export default function CvDocument({
                   <Text style={styles.heading}>
                     {item.institution}
                     {item.location && (
-                      <Text style={styles.muted}> – {item.location}</Text>
+                      <Text style={styles.muted}> - {item.location}</Text>
                     )}
                   </Text>
                   <Text style={styles.date}>
@@ -224,8 +227,9 @@ export default function CvDocument({
                   !item.degree.toLowerCase().includes(item.major.toLowerCase())
                     ? `, ${item.major}`
                     : ""}
+                  {item.gpa ? "," : ""}
                 </Text>
-                {item.gpa && <Text>GPA {item.gpa}</Text>}
+                {item.gpa && <Text style={styles.italic}>GPA {item.gpa}</Text>}
               </View>
             ))}
           </>
@@ -240,7 +244,7 @@ export default function CvDocument({
                     <Text style={styles.heading}>
                       {item.company}
                       {item.location && (
-                        <Text style={styles.muted}> – {item.location}</Text>
+                        <Text style={styles.muted}> - {item.location}</Text>
                       )}
                     </Text>
                     <Text style={styles.date}>
@@ -249,7 +253,10 @@ export default function CvDocument({
                   </View>
                   <Text style={styles.italic}>
                     {item.position}
-                    {item.employmentType ? `, ${item.employmentType}` : ""}
+                    {item.employmentType ? "," : ""}
+                    {item.employmentType && (
+                      <Text style={styles.type}> {item.employmentType}</Text>
+                    )}
                   </Text>
                 </View>
                 <Bullets items={item.responsibilities} />
@@ -263,10 +270,7 @@ export default function CvDocument({
             {projects.map((item) => (
               <View key={item.id} style={styles.item}>
                 <View wrap={false} minPresenceAhead={23}>
-                  <View style={styles.row}>
-                    <Text style={styles.heading}>{item.title}</Text>
-                    <Text style={styles.date}>{item.year}</Text>
-                  </View>
+                  <Text style={styles.bold}>{item.title}</Text>
                   <Text style={styles.tech}>
                     {[item.projectType, item.technologies.join(", ")]
                       .filter(Boolean)
@@ -314,33 +318,30 @@ export default function CvDocument({
           <>
             <Section>SKILLS</Section>
             {skillGroups.some((group) => group.skills.length) && (
-              <Text style={styles.bold} minPresenceAhead={20}>
-                Hard Skills:
-              </Text>
-            )}
-            {skillGroups
-              .filter((group) => group.skills.length)
-              .map((group) => (
-                <Text
-                  key={group.key}
-                  style={styles.skill}
-                  orphans={2}
-                  widows={2}
-                >
-                  • {groupTitles[group.key] || group.title}:{" "}
-                  {group.skills.join(", ")}
+              <>
+                <Text style={styles.label} minPresenceAhead={20}>
+                  Hard Skills<Text style={{ fontFamily: "Helvetica" }}>:</Text>
                 </Text>
-              ))}
+                <Bullets
+                  items={skillGroups
+                    .filter((group) => group.skills.length)
+                    .map(
+                      (group) =>
+                        `${groupTitles[group.key] || group.title}: ${group.skills.join(", ")}`,
+                    )}
+                />
+              </>
+            )}
             {!!softSkills.length && (
-              <Text style={styles.skill}>
-                <Text style={styles.bold}>Soft Skills: </Text>
+              <Text style={[styles.skill, { marginTop: 3 }]}>
+                <Text style={styles.bold}>Soft Skills</Text>:{" "}
                 {softSkills.join(", ")}
               </Text>
             )}
             {!!languages.length && (
               <>
-                <Text style={styles.bold} minPresenceAhead={20}>
-                  Language:
+                <Text style={styles.label} minPresenceAhead={20}>
+                  Language<Text style={{ fontFamily: "Helvetica" }}>:</Text>
                 </Text>
                 <Bullets
                   items={languages.map(

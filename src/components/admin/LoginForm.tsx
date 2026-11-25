@@ -58,7 +58,7 @@ export default function LoginForm({
     }
   }
   return (
-    <main className="flex min-h-screen items-center justify-center px-5 py-16">
+    <main className="admin-login flex min-h-screen items-center justify-center px-5 py-16">
       <div className="w-full max-w-[400px]">
         <Link href="/" className="brand">
           Hanif

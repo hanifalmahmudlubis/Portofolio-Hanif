@@ -24,9 +24,9 @@ export default function PageHeading({
       )}
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div>
-          <h1 className="text-3xl font-medium tracking-[-.04em]">{title}</h1>
+          <h1 className="admin-page-title">{title}</h1>
           {description && (
-            <p className="muted mt-3 max-w-2xl text-xs leading-6">
+            <p className="muted mt-2 max-w-2xl text-sm leading-6">
               {description}
             </p>
           )}
