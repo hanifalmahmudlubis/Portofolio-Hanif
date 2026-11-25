@@ -9,7 +9,7 @@ export default function Projects({ projects }: { projects: Project[] }) {
     <section id="projects" className="section">
       <Container>
         <div className="section-heading-row">
-          <SectionHeading title="Projects" />
+          <SectionHeading title="Projects" command="ls ~/projects --featured" />
           <Link href="/projects" className="text-link">
             All projects <ArrowUpRight size={15} />
           </Link>

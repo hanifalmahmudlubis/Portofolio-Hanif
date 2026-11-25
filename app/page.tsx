@@ -6,15 +6,32 @@ import Experience from "@/components/sections/Experience";
 import Certificate from "@/components/sections/Certificate";
 import Skills from "@/components/sections/Skills";
 import Contact from "@/components/sections/Contact";
+import BootScreen from "@/components/ui/BootScreen";
 import { getPortfolio } from "@/lib/services/portfolio";
+import { buildSkillGroups } from "@/lib/skills";
 export const dynamic = "force-dynamic";
 export default async function Home() {
   const data = await getPortfolio();
+  const techNames = buildSkillGroups(data.technologies).flatMap(
+    (group) => group.skills,
+  );
+  const stats = [
+    { label: "Projects", value: data.projects.length },
+    { label: "Experiences", value: data.experiences.length },
+    { label: "Technologies", value: techNames.length },
+    { label: "Certificates", value: data.certificates.length },
+  ].filter((stat) => stat.value > 0);
   return (
     <>
+      <BootScreen />
       <Header profile={data.profile} />
       <main id="main">
-        <Hero photoUrl={data.introImageUrl} profile={data.profile} />
+        <Hero
+          photoUrl={data.introImageUrl}
+          profile={data.profile}
+          techNames={techNames}
+          stats={stats}
+        />
         <Projects projects={data.projects} />
         <Experience experiences={data.experiences} />
         <Skills technologies={data.technologies} />

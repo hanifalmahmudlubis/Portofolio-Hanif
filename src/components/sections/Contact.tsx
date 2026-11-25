@@ -37,7 +37,14 @@ export default function Contact({
       <Container>
         <div className="contact-layout">
           <Reveal from="left" repeat className="contact-copy">
+            <p className="section-cmd" aria-hidden="true">
+              <span>$</span> ./contact.sh --hello
+            </p>
             <h2 className="section-title">Contact</h2>
+            <p className="contact-headline">
+              Let&apos;s build something{" "}
+              <span className="hero-name-accent">great</span> on the web.
+            </p>
             <p className="contact-description">
               For projects and work opportunities
             </p>
@@ -49,7 +56,7 @@ export default function Contact({
                 href={profile.githubUrl || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="social-link"
+                className="social-link magnetic"
               >
                 <Github size={17} /> GitHub
               </a>
@@ -57,13 +64,19 @@ export default function Contact({
                 href={profile.linkedinUrl || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="social-link"
+                className="social-link magnetic"
               >
                 <Linkedin size={17} /> LinkedIn
               </a>
             </div>
           </Reveal>
-          <Reveal from="up" delay={0.12}>
+          <Reveal from="up" delay={0.12} className="terminal-window">
+            <div className="window-bar" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+              <p>~/contact — zsh</p>
+            </div>
             {sent ? (
               <div role="status" className="contact-form contact-success">
                 <h3 className="text-xl">Message received</h3>

@@ -1,6 +1,6 @@
 "use client";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/types/project";
 import ProjectCard from "./ProjectCard";
 export default function ProjectGrid({
@@ -12,6 +12,22 @@ export default function ProjectGrid({
 }) {
   const [category, setCategory] = useState("All projects");
   const [query, setQuery] = useState("");
+  const search = useRef<HTMLInputElement>(null);
+  // "/" focuses search, like GitHub
+  useEffect(() => {
+    if (!searchable) return;
+    const onKey = (event: KeyboardEvent) => {
+      const typing = (event.target as HTMLElement).closest(
+        "input, textarea, select, [contenteditable]",
+      );
+      if (event.key === "/" && !typing) {
+        event.preventDefault();
+        search.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [searchable]);
   const categories = [
     "All projects",
     ...new Set(projects.map((project) => project.category)),
@@ -39,18 +55,20 @@ export default function ProjectGrid({
           ))}
         </div>
         {searchable && (
-          <label className="relative min-w-[220px]">
+          <label className="command-search relative min-w-[220px]">
             <Search
               size={15}
               className="absolute left-3 top-3.5 text-[#8997ae]"
             />
             <input
+              ref={search}
               className="input !pl-9"
               aria-label="Search projects"
               placeholder="Search projects or technologies…"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
+            <kbd aria-hidden="true">/</kbd>
           </label>
         )}
       </div>
@@ -58,7 +76,9 @@ export default function ProjectGrid({
         {filtered.length} projects found
       </p>
       {filtered.length ? (
-        <div className="project-grid">
+        <div
+          className={`project-grid ${filtered.length > 2 ? "is-bento" : ""}`}
+        >
           {filtered.map((project, index) => (
             <ProjectCard key={project.id} project={project} index={index} />
           ))}

@@ -4,6 +4,9 @@ import { ArrowUpRight } from "lucide-react";
 import type { Project } from "@/types/project";
 import { imageUrl } from "@/lib/urls";
 import Reveal from "../ui/Reveal";
+import BrowserBar from "../ui/BrowserBar";
+import Wireframe from "../ui/Wireframe";
+
 export default function ProjectCard({
   project,
   index = 0,
@@ -16,24 +19,30 @@ export default function ProjectCard({
       project.images[0]?.imageUrl,
   );
   return (
-    <Reveal delay={(index % 2) * 0.06} from="up" className="project-reveal">
+    <Reveal delay={(index % 3) * 0.08} from="up" className="project-reveal">
       <article className={`project-card ${cover ? "has-cover" : ""}`}>
-        {cover && (
-          <Link
-            href={`/projects/${project.slug}`}
-            aria-label={`Preview ${project.title}`}
-            className="project-visual"
-          >
+        <BrowserBar url={`hanif.dev/projects/${project.slug}`} />
+        <Link
+          href={`/projects/${project.slug}`}
+          aria-label={`Preview ${project.title}`}
+          className="project-visual"
+        >
+          {cover ? (
             <Image
               src={cover}
               alt={project.title}
               fill
-              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 410px"
+              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 820px"
               className="object-cover"
             />
-          </Link>
-        )}
+          ) : (
+            <Wireframe label={project.category} />
+          )}
+        </Link>
         <div className="project-card-content">
+          <span className="project-index" aria-hidden="true">
+            {String(index + 1).padStart(2, "0")}
+          </span>
           <div className="project-meta">
             <span className="project-category">{project.category}</span>
             <span className="project-year">{project.year}</span>

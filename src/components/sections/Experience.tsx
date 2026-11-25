@@ -14,8 +14,8 @@ export default function Experience({
   return (
     <section id="experience" className="section">
       <Container>
-        <SectionHeading title="Experience" />
-        <div className="experience-list">
+        <SectionHeading title="Experience" command="git log --career --graph" />
+        <div className="experience-list git-log">
           {experiences.length ? (
             experiences.map((item, index) => (
               <Reveal
@@ -36,6 +36,14 @@ export default function Experience({
                 </div>
                 <div className="experience-content">
                   <span className="timeline-point" aria-hidden="true" />
+                  <p className="commit-meta" aria-hidden="true">
+                    <span className="commit-hash">
+                      commit {item.id.slice(-7)}
+                    </span>
+                    {index === 0 && (
+                      <span className="commit-head">HEAD → main</span>
+                    )}
+                  </p>
                   <h3 className="experience-position">{item.position}</h3>
                   <p className="experience-company">{item.company}</p>
                   {item.location && (

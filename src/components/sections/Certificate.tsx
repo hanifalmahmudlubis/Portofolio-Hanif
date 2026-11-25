@@ -1,8 +1,18 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Certificate as CertificateType } from "@/types/project";
 import Container from "../ui/Container";
+import Reveal from "../ui/Reveal";
 import SectionHeading from "../ui/SectionHeading";
 import { safeUrl } from "@/lib/urls";
+
+const initials = (text: string) =>
+  text
+    .split(/\s+/)
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
 export default function Certificate({
   certificates,
 }: {
@@ -11,11 +21,24 @@ export default function Certificate({
   return (
     <section id="certificates" className="section">
       <Container>
-        <SectionHeading title="Certificates" from="up" />
+        <SectionHeading
+          title="Certificates"
+          from="up"
+          command="ls ./certificates --verified"
+        />
         <div className="certificate-grid">
-          {certificates.map((item) => (
-            <div key={item.id} className="h-full">
+          {certificates.map((item, i) => (
+            <Reveal
+              key={item.id}
+              from="up"
+              delay={(i % 3) * 0.08}
+              className="h-full"
+            >
               <article className="certificate-card">
+                <div className="cert-stub" aria-hidden="true">
+                  <span className="cert-seal">{initials(item.issuer)}</span>
+                  <span className="cert-year">{item.year}</span>
+                </div>
                 <div className="min-w-0 flex-1">
                   <p className="certificate-issuer">{item.issuer}</p>
                   <h3 className="certificate-title">{item.title}</h3>
@@ -33,7 +56,7 @@ export default function Certificate({
                   </a>
                 )}
               </article>
-            </div>
+            </Reveal>
           ))}
         </div>
         {!certificates.length && (

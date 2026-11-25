@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import "./portfolio.css";
 import AuthProvider from "@/components/providers/AuthProvider";
 import ParticleBackground from "@/components/ui/ParticleBackground";
 import Fx3D from "@/components/ui/Fx3D";
