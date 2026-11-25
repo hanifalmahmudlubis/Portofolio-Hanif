@@ -6,7 +6,6 @@ import Experience from "@/components/sections/Experience";
 import Certificate from "@/components/sections/Certificate";
 import Skills from "@/components/sections/Skills";
 import Contact from "@/components/sections/Contact";
-import BootScreen from "@/components/ui/BootScreen";
 import { getPortfolio } from "@/lib/services/portfolio";
 import { buildSkillGroups } from "@/lib/skills";
 export const dynamic = "force-dynamic";
@@ -23,7 +22,6 @@ export default async function Home() {
   ].filter((stat) => stat.value > 0);
   return (
     <>
-      <BootScreen />
       <Header profile={data.profile} />
       <main id="main">
         <Hero

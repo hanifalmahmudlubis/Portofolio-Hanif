@@ -41,11 +41,7 @@ export default function Skills({
   return (
     <section id="skills" className="section">
       <Container>
-        <SectionHeading
-          title="Skills"
-          from="up"
-          command="cat package.json | jq .skills"
-        />
+        <SectionHeading title="Skills" from="up" />
         <div className="skills-layout">
           <div className="skill-orbit" aria-hidden="true">
             <div className="orbit-plane">

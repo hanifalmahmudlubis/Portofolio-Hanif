@@ -4,7 +4,6 @@ import { ArrowUpRight } from "lucide-react";
 import type { Project } from "@/types/project";
 import { imageUrl } from "@/lib/urls";
 import Reveal from "../ui/Reveal";
-import BrowserBar from "../ui/BrowserBar";
 import Wireframe from "../ui/Wireframe";
 
 export default function ProjectCard({
@@ -21,7 +20,6 @@ export default function ProjectCard({
   return (
     <Reveal delay={(index % 3) * 0.08} from="up" className="project-reveal">
       <article className={`project-card ${cover ? "has-cover" : ""}`}>
-        <BrowserBar url={`hanif.dev/projects/${project.slug}`} />
         <Link
           href={`/projects/${project.slug}`}
           aria-label={`Preview ${project.title}`}
@@ -32,17 +30,14 @@ export default function ProjectCard({
               src={cover}
               alt={project.title}
               fill
-              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 820px"
+              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 410px"
               className="object-cover"
             />
           ) : (
-            <Wireframe label={project.category} />
+            <Wireframe />
           )}
         </Link>
         <div className="project-card-content">
-          <span className="project-index" aria-hidden="true">
-            {String(index + 1).padStart(2, "0")}
-          </span>
           <div className="project-meta">
             <span className="project-category">{project.category}</span>
             <span className="project-year">{project.year}</span>

@@ -37,14 +37,7 @@ export default function Contact({
       <Container>
         <div className="contact-layout">
           <Reveal from="left" repeat className="contact-copy">
-            <p className="section-cmd" aria-hidden="true">
-              <span>$</span> ./contact.sh --hello
-            </p>
             <h2 className="section-title">Contact</h2>
-            <p className="contact-headline">
-              Let&apos;s build something{" "}
-              <span className="hero-name-accent">great</span> on the web.
-            </p>
             <p className="contact-description">
               For projects and work opportunities
             </p>

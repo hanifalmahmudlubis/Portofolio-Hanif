@@ -76,9 +76,7 @@ export default function ProjectGrid({
         {filtered.length} projects found
       </p>
       {filtered.length ? (
-        <div
-          className={`project-grid ${filtered.length > 2 ? "is-bento" : ""}`}
-        >
+        <div className="project-grid">
           {filtered.map((project, index) => (
             <ProjectCard key={project.id} project={project} index={index} />
           ))}

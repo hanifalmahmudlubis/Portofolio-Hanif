@@ -5,8 +5,6 @@ import { initialPublicProfile } from "@/lib/site";
 import type { PublicProfile } from "@/types/cv";
 import { ArrowUp } from "lucide-react";
 
-const SLOGAN = ["Let's build the web", "Design", "Develop", "Deploy"];
-
 export default function Footer({
   profile = initialPublicProfile,
 }: {
@@ -14,16 +12,6 @@ export default function Footer({
 }) {
   return (
     <footer className="site-footer">
-      <div className="footer-marquee" aria-hidden="true">
-        <div className="footer-marquee-track">
-          {[...SLOGAN, ...SLOGAN, ...SLOGAN, ...SLOGAN].map((word, i) => (
-            <span key={i}>
-              {word}
-              <b>✦</b>
-            </span>
-          ))}
-        </div>
-      </div>
       <Container>
         <Reveal className="flex flex-wrap items-center justify-between gap-5">
           <p className="text-xs text-[#8996ad]">

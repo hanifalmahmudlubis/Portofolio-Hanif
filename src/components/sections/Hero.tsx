@@ -2,21 +2,10 @@ import Image from "next/image";
 import { ArrowDown, ArrowUpRight, Github, Linkedin } from "lucide-react";
 import Container from "../ui/Container";
 import Reveal from "../ui/Reveal";
-import CodeWindow from "../ui/CodeWindow";
 import BrowserBar from "../ui/BrowserBar";
 import CountUp from "../ui/CountUp";
-import RotatingWords from "../ui/RotatingWords";
 import { DEFAULT_INTRO_IMAGE, initialPublicProfile } from "@/lib/site";
 import type { PublicProfile } from "@/types/cv";
-
-const BUILDS = [
-  "websites",
-  "web apps",
-  "REST APIs",
-  "dashboards",
-  "mobile apps",
-  "ML models",
-];
 
 export default function Hero({
   photoUrl = DEFAULT_INTRO_IMAGE,
@@ -35,10 +24,6 @@ export default function Hero({
       <Container className="relative">
         <div className="hero-grid">
           <div className="hero-copy">
-            <Reveal from="fade" className="hero-status">
-              <span className="status-dot" aria-hidden="true" />
-              Open to opportunities · {profile.location}
-            </Reveal>
             <h1 className="hero-title">
               <Reveal as="span" from="left" delay={0.08} repeat>
                 {words.slice(0, 2).join(" ")}
@@ -56,9 +41,6 @@ export default function Hero({
             <Reveal from="up" delay={0.32}>
               <p className="hero-role">{profile.professionalTitle}</p>
             </Reveal>
-            <p className="hero-build">
-              I build <RotatingWords words={BUILDS} />
-            </p>
             <p className="hero-description">
               {profile.shortBio}
               <span className="block mt-3">{profile.educationLine}</span>
@@ -99,7 +81,6 @@ export default function Hero({
           <div className="hero-stage">
             <div className="stack3d">
               <div className="layer layer-html" aria-hidden="true">
-                <span className="layer-label">index.html</span>
                 <div className="wf-nav">
                   <i />
                   <i />
@@ -113,7 +94,6 @@ export default function Hero({
                 </div>
               </div>
               <div className="layer layer-css" aria-hidden="true">
-                <span className="layer-label">styles.css</span>
                 <div className="css-swatches">
                   <i />
                   <i />
@@ -123,11 +103,8 @@ export default function Hero({
                 <p className="css-type">Aa</p>
               </div>
               <div className="layer layer-app">
-                <span className="layer-label" aria-hidden="true">
-                  localhost:3000
-                </span>
                 <div className="hero-browser">
-                  <BrowserBar url="hanif.dev" />
+                  <BrowserBar />
                   <div className="hero-portrait">
                     <Image
                       src={photoUrl}
@@ -138,9 +115,6 @@ export default function Hero({
                     />
                   </div>
                 </div>
-              </div>
-              <div className="layer layer-code">
-                <CodeWindow profile={profile} />
               </div>
             </div>
           </div>

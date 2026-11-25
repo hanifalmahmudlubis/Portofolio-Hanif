@@ -53,9 +53,6 @@ export default async function ProjectDetailPage({ params }: Props) {
               >
                 <ArrowLeft size={14} /> All projects
               </Link>
-              <p className="section-cmd" aria-hidden="true">
-                <span>$</span> open ./projects/{project.slug}
-              </p>
               <div className="flex flex-wrap items-center gap-3">
                 <span className="eyebrow">{project.category}</span>
                 <span className="font-mono text-[12px] text-[#8997ae]">
@@ -100,13 +97,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             </Reveal>
             <Reveal from="right" delay={0.15} className="detail-mockup">
               <div className="tilt-frame">
-                <BrowserBar
-                  url={(
-                    demo ||
-                    repository ||
-                    `hanif.dev/projects/${project.slug}`
-                  ).replace(/^https?:\/\//, "")}
-                />
+                <BrowserBar />
                 <div className="detail-screen">
                   {cover ? (
                     <Image
@@ -118,7 +109,7 @@ export default async function ProjectDetailPage({ params }: Props) {
                       className="object-cover"
                     />
                   ) : (
-                    <Wireframe label={project.category} />
+                    <Wireframe />
                   )}
                 </div>
               </div>
@@ -152,38 +143,6 @@ export default async function ProjectDetailPage({ params }: Props) {
 
           <div className="detail-body">
             <Reveal className="detail-aside">
-              <div className="code-card" aria-hidden="true">
-                <BrowserBar url="project.json" />
-                <pre>
-                  <code>
-                    {"{\n"}
-                    {"  "}
-                    <span className="tok-var">&quot;name&quot;</span>:{" "}
-                    <span className="tok-str">&quot;{project.slug}&quot;</span>,
-                    {"\n"}
-                    {"  "}
-                    <span className="tok-var">&quot;type&quot;</span>:{" "}
-                    <span className="tok-str">
-                      &quot;{project.projectType}&quot;
-                    </span>
-                    ,{"\n"}
-                    {"  "}
-                    <span className="tok-var">&quot;year&quot;</span>:{" "}
-                    <span className="tok-key">{project.year}</span>,{"\n"}
-                    {"  "}
-                    <span className="tok-var">&quot;stack&quot;</span>: [{"\n"}
-                    {stack.map((name, i) => (
-                      <span key={name}>
-                        {"    "}
-                        <span className="tok-str">&quot;{name}&quot;</span>
-                        {i < stack.length - 1 ? "," : ""}
-                        {"\n"}
-                      </span>
-                    ))}
-                    {"  ]\n}"}
-                  </code>
-                </pre>
-              </div>
               {!!stack.length && (
                 <div className="mt-8">
                   <h2 className="muted mb-3 text-xs">Built with</h2>

@@ -21,11 +21,7 @@ export default function Certificate({
   return (
     <section id="certificates" className="section">
       <Container>
-        <SectionHeading
-          title="Certificates"
-          from="up"
-          command="ls ./certificates --verified"
-        />
+        <SectionHeading title="Certificates" from="up" />
         <div className="certificate-grid">
           {certificates.map((item, i) => (
             <Reveal
@@ -37,7 +33,6 @@ export default function Certificate({
               <article className="certificate-card">
                 <div className="cert-stub" aria-hidden="true">
                   <span className="cert-seal">{initials(item.issuer)}</span>
-                  <span className="cert-year">{item.year}</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="certificate-issuer">{item.issuer}</p>
