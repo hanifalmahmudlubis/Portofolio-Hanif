@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 // Cards that get a pointer-driven 3D tilt + glare (styled in globals.css via --rx/--ry/--gx/--gy).
@@ -8,10 +9,12 @@ const MAX = 8; // degrees
 
 /** Page-wide motion layer: card tilt, cursor spotlight, scroll progress. Decorative only. */
 export default function Fx3D() {
+  const isAdmin = usePathname().startsWith("/admin");
   const bar = useRef<HTMLDivElement>(null);
   const spot = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (isAdmin) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
     let current: HTMLElement | null = null;
@@ -66,8 +69,9 @@ export default function Fx3D() {
       document.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("scroll", onScroll);
     };
-  }, []);
+  }, [isAdmin]);
 
+  if (isAdmin) return null;
   return (
     <>
       <div ref={bar} aria-hidden="true" className="scroll-progress" />
