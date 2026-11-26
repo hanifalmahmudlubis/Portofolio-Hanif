@@ -68,7 +68,7 @@ test("CV copy stays concise without changing the original website description", 
     ["One concise responsibility"],
   );
   assert.throws(
-    () => bulletInput(["a", "b", "c", "d"], "responsibilities"),
+    () => bulletInput(["a", "b", "c", "d", "e"], "responsibilities"),
     ApiError,
   );
   const original =
@@ -103,9 +103,9 @@ test("automatic CV points use full project details and action clauses without fa
   const experience = experienceCvPoints(
     "Assisted network troubleshooting, performed network speed testing, supported monitoring, and participated in an automation project.",
   );
-  assert.equal(experience.length, 3);
+  assert.equal(experience.length, 4);
   assert.ok(experience[2].includes("Supported monitoring"));
-  assert.ok(experience[2].includes("Participated in an automation project."));
+  assert.ok(experience[3].includes("Participated in an automation project."));
   assert.deepEqual(
     experienceCvPoints(
       "Developed interfaces using HTML, CSS, JavaScript, and Laravel. Performed debugging and optimization.",

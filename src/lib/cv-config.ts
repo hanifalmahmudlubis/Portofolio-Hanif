@@ -1,10 +1,10 @@
 // Bump when layout or automatic content rules change, so an open editor refreshes cached PDFs.
-export const CV_TEMPLATE_VERSION = 2;
+export const CV_TEMPLATE_VERSION = 3;
 export const CV_LIMITS = {
   pages: 2,
   summary: 600,
   projectPoints: 3,
-  experiencePoints: 3,
+  experiencePoints: 4,
   pointCharacters: 240,
 } as const;
 
