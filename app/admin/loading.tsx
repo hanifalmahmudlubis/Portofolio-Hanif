@@ -1,6 +1,6 @@
 export default function AdminLoading() {
   return (
-    <div className="admin-panel text-sm text-[#9ba6ba]" role="status">
+    <div className="admin-panel text-sm text-mute" role="status">
       Memuat workspace…
     </div>
   );

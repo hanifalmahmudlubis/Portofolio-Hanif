@@ -69,7 +69,7 @@ export default function Messages({ messages }: { messages: ContactMessage[] }) {
             <div className="flex flex-wrap items-start justify-between gap-5">
               <div className="flex items-start gap-4">
                 <span
-                  className={`rounded-lg p-3 ${message.isRead ? "bg-[#172030] text-[#8997ae]" : "bg-[#91a6df]/10 text-[#91a6df]"}`}
+                  className={`rounded-lg p-3 ${message.isRead ? "bg-sand text-mute" : "bg-brand/10 text-brand"}`}
                 >
                   {message.isRead ? <MailOpen size={19} /> : <Mail size={19} />}
                 </span>
@@ -78,7 +78,7 @@ export default function Messages({ messages }: { messages: ContactMessage[] }) {
                   <p className="muted mt-2 text-xs">
                     {message.name} ·{" "}
                     <a
-                      className="break-all text-[#91a6df]"
+                      className="break-all text-brand"
                       href={`mailto:${message.email}`}
                     >
                       {message.email}
@@ -86,17 +86,17 @@ export default function Messages({ messages }: { messages: ContactMessage[] }) {
                   </p>
                 </div>
               </div>
-              <span className="font-mono text-[12px] text-[#8997ae]">
+              <span className="font-mono text-[12px] text-mute">
                 {new Intl.DateTimeFormat("id-ID", {
                   dateStyle: "medium",
                   timeZone: "Asia/Jakarta",
                 }).format(new Date(message.createdAt))}
               </span>
             </div>
-            <p className="my-6 whitespace-pre-wrap break-words text-sm leading-7 text-[#b9c3d5]">
+            <p className="my-6 whitespace-pre-wrap break-words text-sm leading-7 text-ink-soft">
               {message.message}
             </p>
-            <div className="flex flex-wrap justify-between gap-4 border-t border-[#212a39] pt-5">
+            <div className="flex flex-wrap justify-between gap-4 border-t border-line pt-5">
               <a
                 href={`mailto:${message.email}?subject=${encodeURIComponent("Re: " + message.subject)}`}
                 className="admin-action"

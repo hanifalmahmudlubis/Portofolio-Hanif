@@ -268,9 +268,9 @@ export default function ProjectForm({
                 {images.map((image) => (
                   <div
                     key={image.id}
-                    className="overflow-hidden rounded-lg border border-[#263146]"
+                    className="overflow-hidden rounded-lg border border-line"
                   >
-                    <div className="relative aspect-video bg-[#07090e]">
+                    <div className="relative aspect-video bg-sand">
                       {imageUrl(image.imageUrl) && (
                         <Image
                           src={imageUrl(image.imageUrl)!}
@@ -314,8 +314,8 @@ export default function ProjectForm({
                 ))}
               </div>
             )}
-            <label className="field rounded-lg border border-dashed border-[#3b5590] bg-[#090d16] p-6">
-              <span className="mb-2 flex items-center gap-3 text-sm text-[#91a6df]">
+            <label className="field rounded-lg border border-dashed border-brand bg-sand p-6">
+              <span className="mb-2 flex items-center gap-3 text-sm text-brand">
                 <ImagePlus size={20} />
                 Tambahkan gambar
               </span>
@@ -334,7 +334,7 @@ export default function ProjectForm({
               </small>
               <small>Galeri proyek berganti otomatis setiap 5 detik</small>
               {pendingFiles.length > 0 && (
-                <span className="text-xs text-[#91a6df]">
+                <span className="text-xs text-brand">
                   {pendingFiles.length} gambar menunggu unggahan saat proyek
                   disimpan.
                 </span>
@@ -346,7 +346,7 @@ export default function ProjectForm({
           <FormSection title="Publikasi">
             <label className="flex items-start gap-3 text-sm">
               <input
-                className="mt-1 accent-[#91a6df]"
+                className="mt-1 accent-brand"
                 type="checkbox"
                 name="published"
                 defaultChecked={project?.published}
@@ -360,7 +360,7 @@ export default function ProjectForm({
             </label>
             <label className="flex items-start gap-3 text-sm">
               <input
-                className="mt-1 accent-[#91a6df]"
+                className="mt-1 accent-brand"
                 type="checkbox"
                 name="featured"
                 defaultChecked={project?.featured}
@@ -402,11 +402,11 @@ export default function ProjectForm({
               {technologies.map((technology) => (
                 <label
                   key={technology.id}
-                  className={`flex cursor-pointer items-center gap-2 rounded border px-2 py-1.5 text-[13px] ${selected.includes(technology.id) ? "border-[#56709b] bg-[#91a6df]/10 text-[#91a6df]" : "border-[#263146] text-[#9ba6ba]"}`}
+                  className={`flex cursor-pointer items-center gap-2 rounded border px-2 py-1.5 text-[13px] ${selected.includes(technology.id) ? "border-brand bg-brand/10 text-brand" : "border-line text-mute"}`}
                 >
                   <input
                     type="checkbox"
-                    className="accent-[#91a6df]"
+                    className="accent-brand"
                     checked={selected.includes(technology.id)}
                     onChange={(event) =>
                       setSelected((previous) =>
@@ -420,7 +420,7 @@ export default function ProjectForm({
                 </label>
               ))}
             </div>
-            <div className="space-y-3 border-t border-[#263146] pt-4">
+            <div className="space-y-3 border-t border-line pt-4">
               <Field
                 label="Teknologi baru"
                 placeholder="Contoh: React"
@@ -468,7 +468,7 @@ export default function ProjectForm({
           </FormSection>
         </div>
       </fieldset>
-      <div className="mt-7 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[#263146] bg-[#10151f] p-5">
+      <div className="mt-7 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-line bg-sand p-5">
         <p className="muted text-xs">
           {phase || "Perubahan akan diterapkan setelah disimpan."}
         </p>

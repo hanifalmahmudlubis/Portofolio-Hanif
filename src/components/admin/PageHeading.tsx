@@ -12,21 +12,18 @@ export default function PageHeading({
   action?: { href: string; label: string };
 }) {
   return (
-    <div className="mb-8">
+    <div className="mb-10">
       {back && (
-        <Link
-          href={back}
-          className="muted mb-5 inline-flex items-center gap-2 text-xs"
-        >
+        <Link href={back} className="detail-back mb-5">
           <ArrowLeft size={14} />
           Kembali
         </Link>
       )}
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div>
-          <h1 className="text-3xl font-medium tracking-[-.04em]">{title}</h1>
+          <h1 className="admin-page-title">{title}</h1>
           {description && (
-            <p className="muted mt-3 max-w-2xl text-xs leading-6">
+            <p className="muted mt-3 max-w-2xl text-sm leading-6">
               {description}
             </p>
           )}

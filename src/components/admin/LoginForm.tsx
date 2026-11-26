@@ -3,6 +3,7 @@ import { useState } from "react";
 import { getSession, signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import Scene3D from "@/components/ui/Scene3D";
 export default function LoginForm({
   expired = false,
   reset = false,
@@ -58,89 +59,95 @@ export default function LoginForm({
     }
   }
   return (
-    <main className="flex min-h-screen items-center justify-center px-5 py-16">
-      <div className="w-full max-w-[400px]">
-        <Link href="/" className="brand">
-          Hanif
-        </Link>
-        <div className="admin-panel mt-8 !p-7 sm:!p-8">
-          <h1 className="text-2xl font-medium tracking-tight">Admin</h1>
-          <p className="muted mb-7 mt-2 text-sm">
-            Masuk untuk mengelola portofolio.
-          </p>
-          {(expired || reset) && (
-            <p role="status" className="notice mb-5">
-              {reset
-                ? "Sesi browser telah dihapus, silakan login kembali"
-                : "Sesi telah berakhir, silakan login kembali"}
+    <div className="admin-login">
+      <div className="admin-login-art" aria-hidden="true">
+        <Scene3D variant="dark" />
+        <p className="display">Studio</p>
+      </div>
+      <main className="flex min-h-screen items-center justify-center px-5 py-16">
+        <div className="w-full max-w-[420px]">
+          <Link href="/" className="brand">
+            Hanif
+          </Link>
+          <div className="mt-10">
+            <h1 className="admin-page-title">Admin</h1>
+            <p className="muted mb-7 mt-2 text-sm">
+              Masuk untuk mengelola portofolio.
             </p>
-          )}
-          <form onSubmit={submit} className="space-y-5">
-            <label className="field">
-              Email admin
-              <input
-                name="email"
-                type="email"
-                autoComplete="username"
-                required
-                maxLength={254}
-                placeholder="Email"
-              />
-            </label>
-            <label className="field">
-              Password
-              <div className="relative">
-                <input
-                  name="password"
-                  type={show ? "text" : "password"}
-                  autoComplete="current-password"
-                  required
-                  maxLength={72}
-                  className="!pr-12"
-                  placeholder="Password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShow(!show)}
-                  aria-label={
-                    show ? "Sembunyikan password" : "Tampilkan password"
-                  }
-                  className="absolute right-3 top-3.5 text-[#8997ae]"
-                >
-                  {show ? <EyeOff size={17} /> : <Eye size={17} />}
-                </button>
-              </div>
-            </label>
-            {error && (
-              <p role="alert" className="notice notice-error">
-                {error}
+            {(expired || reset) && (
+              <p role="status" className="notice mb-5">
+                {reset
+                  ? "Sesi browser telah dihapus, silakan login kembali"
+                  : "Sesi telah berakhir, silakan login kembali"}
               </p>
             )}
-            <button
-              disabled={busy || preparingSession}
-              className="button button-primary w-full"
+            <form onSubmit={submit} className="space-y-5">
+              <label className="field">
+                Email admin
+                <input
+                  name="email"
+                  type="email"
+                  autoComplete="username"
+                  required
+                  maxLength={254}
+                  placeholder="Email"
+                />
+              </label>
+              <label className="field">
+                Password
+                <div className="relative">
+                  <input
+                    name="password"
+                    type={show ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    maxLength={72}
+                    className="!pr-12"
+                    placeholder="Password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow(!show)}
+                    aria-label={
+                      show ? "Sembunyikan password" : "Tampilkan password"
+                    }
+                    className="absolute right-4 top-4 text-mute"
+                  >
+                    {show ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </div>
+              </label>
+              {error && (
+                <p role="alert" className="notice notice-error">
+                  {error}
+                </p>
+              )}
+              <button
+                disabled={busy || preparingSession}
+                className="button button-primary w-full"
+              >
+                {preparingSession
+                  ? "Menyiapkan sesi…"
+                  : busy
+                    ? "Memeriksa akun…"
+                    : "Masuk"}
+              </button>
+            </form>
+            <Link
+              href="/admin/session"
+              className="muted mt-5 inline-block text-sm underline-offset-4 hover:text-primary hover:underline"
             >
-              {preparingSession
-                ? "Menyiapkan sesi…"
-                : busy
-                  ? "Memeriksa akun…"
-                  : "Masuk"}
-            </button>
-          </form>
+              Hapus sesi browser
+            </Link>
+          </div>
           <Link
-            href="/admin/session"
-            className="muted mt-5 inline-block text-sm underline-offset-4 hover:text-primary hover:underline"
+            href="/"
+            className="muted mt-6 inline-block text-xs hover:text-primary"
           >
-            Hapus sesi browser
+            Kembali ke portofolio
           </Link>
         </div>
-        <Link
-          href="/"
-          className="muted mt-6 inline-block text-xs hover:text-primary"
-        >
-          Kembali ke portofolio
-        </Link>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

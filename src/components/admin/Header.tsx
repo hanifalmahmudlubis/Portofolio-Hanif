@@ -20,27 +20,27 @@ export default function Header({
 }) {
   const pathname = usePathname();
   return (
-    <header className="flex h-[76px] items-center justify-between gap-4 border-b border-border px-5 md:px-10">
+    <header className="admin-topbar">
       <div className="flex items-center gap-3">
         <button
           onClick={onMenu}
           aria-label="Buka navigasi admin"
           aria-expanded={open}
           aria-controls="admin-navigation"
-          className="p-2 lg:hidden"
+          className="icon-button lg:hidden"
         >
           <Menu size={20} />
         </button>
-        <span className="text-xs text-[#9ba6ba]">
-          Admin / {names[pathname.split("/")[2]] || "Konten"}
+        <span className="admin-crumb">
+          Admin / <strong>{names[pathname.split("/")[2]] || "Konten"}</strong>
         </span>
       </div>
       <Link
         href="/"
         target="_blank"
-        className="inline-flex items-center gap-2 text-xs text-primary"
+        className="button button-secondary !min-h-10 !px-4 !text-[13px]"
       >
-        Lihat situs <ArrowUpRight size={13} />
+        Lihat situs <ArrowUpRight size={14} />
       </Link>
     </header>
   );

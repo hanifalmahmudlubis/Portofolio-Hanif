@@ -1,6 +1,8 @@
 import { normalizeMonth } from "./dates";
 import type { PublicProfile } from "../types/cv";
 export const DEFAULT_INTRO_IMAGE = "/profile.jpg";
+/** Background-free version of the default portrait, used by the 3D hero. */
+export const DEFAULT_INTRO_CUTOUT = "/profile-cutout.png";
 export const site = {
   name: "Hanif Al Mahmud Lubis",
   email: "hanifmahmud2905@gmail.com",

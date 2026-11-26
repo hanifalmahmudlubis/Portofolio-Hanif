@@ -29,6 +29,9 @@ export default function Header({
 }) {
   const [open, setOpen] = useState(false);
   const [visibleSection, setVisibleSection] = useState("intro");
+  const [scrolled, setScrolled] = useState(false);
+  // True while the header sits over the dark opening screen on the home page.
+  const [over, setOver] = useState(false);
   const navigationFrame = useRef(0);
   const pathname = usePathname();
   function navigate(event: MouseEvent<HTMLAnchorElement>, href: string) {
@@ -61,7 +64,14 @@ export default function Header({
   }
   useEffect(() => {
     if (pathname !== "/") return;
-    const section = visibleElement(window.location.hash.slice(1));
+    const hash = window.location.hash.slice(1);
+    // The intro link should land on the portrait screen, not below it.
+    if (hash === "intro" || hash === "home") {
+      window.history.replaceState(null, "", "/");
+      window.scrollTo({ top: 0, behavior: "instant" });
+      return;
+    }
+    const section = visibleElement(hash);
     const frame = section
       ? requestAnimationFrame(() =>
           section.scrollIntoView({ block: "start", behavior: "instant" }),
@@ -74,7 +84,9 @@ export default function Header({
   }, [pathname]);
   const activeSection =
     pathname === "/"
-      ? visibleSection
+      ? over
+        ? null
+        : visibleSection
       : pathname.startsWith("/projects")
         ? "projects"
         : null;
@@ -127,6 +139,22 @@ export default function Header({
     };
   }, [pathname, open]);
   useEffect(() => {
+    const update = () => {
+      setScrolled(window.scrollY > 8);
+      const splash = document.getElementById("home");
+      setOver(
+        Boolean(splash) && window.scrollY < (splash?.offsetHeight ?? 0) - 200,
+      );
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [pathname]);
+  useEffect(() => {
     if (!open) return;
     const close = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
@@ -139,19 +167,22 @@ export default function Header({
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      <header className="site-header">
+      <header
+        className="site-header"
+        data-scrolled={scrolled || open}
+        data-over={over && !open}
+      >
         <div className="container flex h-[76px] items-center justify-between gap-6">
           <Link
             href="/"
             className="brand"
             aria-label={`${profile.fullName.split(" ")[0]} — home`}
           >
-            <span className="hidden sm:inline">{profile.fullName}</span>
-            <span className="sm:hidden">{profile.fullName.split(" ")[0]}</span>
+            {profile.fullName.split(" ")[0]}
           </Link>
           <nav
             aria-label="Main navigation"
-            className="hidden items-center gap-1 xl:gap-2 lg:flex"
+            className="public-nav hidden lg:flex"
           >
             {menus.map(([label, href]) => (
               <Link
@@ -165,7 +196,7 @@ export default function Header({
               </Link>
             ))}
           </nav>
-          <div className="hidden items-center gap-4 lg:flex">
+          <div className="hidden items-center gap-5 lg:flex">
             <a
               href={profile.githubUrl || undefined}
               target="_blank"
@@ -199,7 +230,7 @@ export default function Header({
           <nav
             id="mobile-navigation"
             aria-label="Mobile navigation"
-            className="flex flex-col gap-1 border-t border-border py-4 lg:hidden"
+            className="flex flex-col gap-1 py-4 lg:hidden"
           >
             {menus.map(([label, href]) => (
               <Link

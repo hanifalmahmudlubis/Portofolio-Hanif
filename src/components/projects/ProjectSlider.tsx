@@ -104,7 +104,7 @@ export default function ProjectSlider({
       }}
     >
       <div
-        className="gallery-stage relative aspect-[4/3] overflow-hidden rounded-xl border border-border md:aspect-[16/9]"
+        className="gallery-stage relative aspect-4/3 overflow-hidden rounded-xl md:aspect-16/9"
         onPointerEnter={(event) => {
           if (event.pointerType === "mouse") setHovered(true);
         }}
@@ -162,14 +162,14 @@ export default function ProjectSlider({
           <>
             <button
               onClick={previous}
-              className="icon-button gallery-control absolute bottom-5 left-4"
+              className="icon-button gallery-control absolute bottom-1/2 left-4 translate-y-1/2"
               aria-label="Previous screenshot"
             >
               <ArrowLeft size={19} />
             </button>
             <button
               onClick={next}
-              className="icon-button gallery-control absolute bottom-5 right-4"
+              className="icon-button gallery-control absolute bottom-1/2 right-4 translate-y-1/2"
               aria-label="Next screenshot"
             >
               <ArrowRight size={19} />
@@ -207,7 +207,7 @@ export default function ProjectSlider({
               <span>{playing ? "Pause" : "Play"}</span>
             </button>
           )}
-          <span className="font-mono text-xs text-[#9ba6ba]">
+          <span className="muted text-sm font-semibold tabular-nums">
             {String(activeIndex + 1).padStart(2, "0")} /{" "}
             {String(validImages.length).padStart(2, "0")}
           </span>

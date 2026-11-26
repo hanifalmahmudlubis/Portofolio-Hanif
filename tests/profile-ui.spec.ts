@@ -49,9 +49,10 @@ test("admin intro photo editor previews, saves and resets the public portrait", 
     "Foto awal digunakan kembali",
   );
   await page.goto("/");
+  // The default portrait is shown as its background-free cutout in the hero.
   await expect(
     page.getByRole("img", { name: "Hanif Al Mahmud Lubis", exact: true }),
-  ).toHaveAttribute("src", "/profile.jpg");
+  ).toHaveAttribute("src", "/profile-cutout.png");
 });
 
 test("header marks the visible section, deep links and project routes on desktop and mobile", async ({

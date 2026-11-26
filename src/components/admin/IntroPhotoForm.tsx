@@ -2,11 +2,17 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import PhotoCropper, {
+  cropFile,
+  cropShapes,
+  type CropArea,
+  type CropShape,
+} from "./PhotoCropper";
 import { useRouter } from "next/navigation";
 import { Save, Upload } from "lucide-react";
 import { api, errorMessage } from "@/lib/api-client";
 import { MAX_IMAGE_SIZE } from "@/lib/upload-config";
-import { DEFAULT_INTRO_IMAGE } from "@/lib/site";
+import { DEFAULT_INTRO_CUTOUT, DEFAULT_INTRO_IMAGE } from "@/lib/site";
 
 export default function IntroPhotoForm({ initialUrl }: { initialUrl: string }) {
   const router = useRouter();
@@ -16,6 +22,8 @@ export default function IntroPhotoForm({ initialUrl }: { initialUrl: string }) {
     file: File;
     url: string;
   } | null>(null);
+  const [shape, setShape] = useState<CropShape>("square");
+  const [crop, setCrop] = useState<CropArea | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -34,8 +42,16 @@ export default function IntroPhotoForm({ initialUrl }: { initialUrl: string }) {
     setError("");
     setMessage("");
     try {
+      // Upload only the area chosen in the cropper; fall back to the original file.
+      let file = selection.file;
+      try {
+        file = await cropFile(selection.file, selection.url, crop);
+      } catch {
+        file = selection.file;
+      }
+      if (file.size > MAX_IMAGE_SIZE) file = selection.file;
       const body = new FormData();
-      body.append("images", selection.file);
+      body.append("images", file);
       const result = await api<{ introImageUrl: string }>(
         "/api/admin/profile",
         { method: "POST", body },
@@ -77,18 +93,36 @@ export default function IntroPhotoForm({ initialUrl }: { initialUrl: string }) {
     <form onSubmit={save} className="admin-panel max-w-4xl">
       <fieldset
         disabled={busy}
-        className="grid min-w-0 gap-8 md:grid-cols-[280px_1fr]"
+        className="grid min-w-0 gap-8 md:grid-cols-[minmax(0,440px)_1fr]"
       >
-        <div className="relative aspect-[4/5] w-full max-w-[320px] overflow-hidden rounded-xl border border-border bg-background">
-          <Image
-            src={selection?.url || currentUrl}
-            alt={selection ? "Pratinjau foto intro" : "Foto intro saat ini"}
-            fill
-            unoptimized
-            sizes="320px"
-            className="object-cover object-[center_25%]"
+        {selection ? (
+          <PhotoCropper
+            key={`${selection.url}-${shape}`}
+            src={selection.url}
+            alt="Pratinjau foto intro"
+            shape={shape}
+            onCrop={setCrop}
           />
-        </div>
+        ) : (
+          <div className="intro-preview">
+            <Image
+              src={
+                currentUrl === DEFAULT_INTRO_IMAGE
+                  ? DEFAULT_INTRO_CUTOUT
+                  : currentUrl
+              }
+              alt="Foto intro saat ini"
+              fill
+              unoptimized
+              sizes="440px"
+              className={
+                currentUrl === DEFAULT_INTRO_IMAGE
+                  ? "object-contain object-bottom"
+                  : "object-cover object-[center_22%]"
+              }
+            />
+          </div>
+        )}
         <div className="min-w-0 space-y-6 self-center">
           <label className="field">
             <span className="flex items-center gap-2">
@@ -116,9 +150,29 @@ export default function IntroPhotoForm({ initialUrl }: { initialUrl: string }) {
               }}
             />
             <small>
-              PNG, JPEG, WebP, GIF · Maksimal 4 MB · Foto vertikal disarankan
+              PNG, JPEG, WebP, GIF · Maksimal 4 MB · Geser dan zoom foto untuk
+              memilih area
             </small>
           </label>
+          {selection && (
+            <div
+              className="flex flex-wrap gap-2"
+              role="group"
+              aria-label="Bentuk crop"
+            >
+              {cropShapes.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  className="project-filter"
+                  aria-pressed={shape === item.key}
+                  onClick={() => setShape(item.key)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
           {selection && (
             <p className="muted break-all text-sm">{selection.file.name}</p>
           )}

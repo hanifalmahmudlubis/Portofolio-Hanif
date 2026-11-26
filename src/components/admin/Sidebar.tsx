@@ -36,20 +36,18 @@ export default function Sidebar({
   return (
     <aside id="admin-navigation" className="admin-sidebar" data-open={open}>
       <div className="flex items-center justify-between">
-        <Link href="/admin/dashboard" onClick={close} className="brand">
+        <Link href="/admin/dashboard" onClick={close} className="brand px-3">
           Hanif
         </Link>
         <button
           onClick={close}
-          className="p-2 lg:hidden"
+          className="rounded-full p-2 text-[#e9dfd2] hover:bg-white/10 lg:hidden"
           aria-label="Tutup menu"
         >
           <X size={18} />
         </button>
       </div>
-      <p className="muted mb-4 mt-10 px-3 text-[12px] uppercase tracking-wider">
-        Admin
-      </p>
+      <p className="admin-sidebar-label">Studio</p>
       <nav aria-label="Navigasi admin" className="space-y-1">
         {navigation.map(({ title, href, icon: Icon }) => (
           <Link
@@ -59,12 +57,12 @@ export default function Sidebar({
             className="admin-nav-link"
             aria-current={pathname.startsWith(href) ? "page" : undefined}
           >
-            <Icon size={16} strokeWidth={1.5} />
+            <Icon size={17} strokeWidth={1.6} />
             {title}
           </Link>
         ))}
       </nav>
-      <div className="mt-auto space-y-2 border-t border-border pt-5">
+      <div className="mt-auto space-y-1 border-t border-white/10 pt-5">
         <Link href="/" target="_blank" className="admin-nav-link">
           Lihat portofolio <ArrowUpRight size={14} className="ml-auto" />
         </Link>

@@ -53,7 +53,7 @@ export default function DeleteButton({
           if (busy) event.preventDefault();
         }}
       >
-        <div className="mb-5 inline-flex rounded-lg bg-[#ffada3]/10 p-3 text-[#ffada3]">
+        <div className="mb-5 inline-flex rounded-lg bg-danger/10 p-3 text-danger">
           <Trash2 size={24} />
         </div>
         <h2 className="text-xl font-medium">Hapus konten ini?</h2>
@@ -79,7 +79,7 @@ export default function DeleteButton({
             type="button"
             disabled={busy}
             onClick={remove}
-            className="button !bg-[#efa99c] !text-[#391b15]"
+            className="button !bg-danger !text-white"
           >
             {busy ? "Menghapus…" : "Ya, hapus"}
           </button>

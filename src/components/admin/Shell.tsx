@@ -53,7 +53,7 @@ export default function AdminShell({
         {open && (
           <button
             aria-label="Tutup navigasi admin"
-            className="fixed inset-0 z-40 bg-black/70 lg:hidden"
+            className="fixed inset-0 z-40 bg-ink/40 backdrop-blur-sm lg:hidden"
             onClick={() => setOpen(false)}
           />
         )}

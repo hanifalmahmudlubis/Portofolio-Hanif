@@ -39,13 +39,10 @@ export default function ProjectGrid({
           ))}
         </div>
         {searchable && (
-          <label className="relative min-w-[220px]">
-            <Search
-              size={15}
-              className="absolute left-3 top-3.5 text-[#8997ae]"
-            />
+          <label className="relative min-w-[260px]">
+            <Search size={15} className="absolute left-4 top-4 text-mute" />
             <input
-              className="input !pl-9"
+              className="input !rounded-full !pl-11"
               aria-label="Search projects"
               placeholder="Search projects or technologies…"
               value={query}
@@ -68,7 +65,7 @@ export default function ProjectGrid({
           <p>No projects found.</p>
           {(query || category !== "All projects") && (
             <button
-              className="mt-4 text-sm text-[#91a6df]"
+              className="mt-4 text-sm font-semibold text-brand underline underline-offset-4"
               onClick={() => {
                 setQuery("");
                 setCategory("All projects");

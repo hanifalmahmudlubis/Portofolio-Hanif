@@ -142,7 +142,7 @@ test("desktop public pages render, filter projects and link to the requested pro
     "certificates",
     "contact",
   ]);
-  await expect(page.locator(".particle-canvas")).toBeVisible();
+  await expect(page.locator("#intro .scene-canvas")).toBeVisible();
   await expect(
     page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
   ).toHaveText([
@@ -262,7 +262,6 @@ test("admin project UI supports create, upload, publication, edit, gallery and d
   await expect(
     page.getByRole("heading", { name: "Ringkasan", exact: true }),
   ).toBeVisible();
-  await expect(page.locator(".particle-canvas")).toHaveCount(0);
   await page.screenshot({
     path: "test-results/admin-dashboard.png",
     fullPage: true,

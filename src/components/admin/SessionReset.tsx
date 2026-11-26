@@ -52,7 +52,7 @@ export default function SessionReset() {
           <p className="muted mt-3 text-sm leading-6">
             Hapus sesi tersimpan pada browser ini untuk mencoba login kembali
           </p>
-          <div className="my-6 rounded-lg border border-border bg-black/15 p-4">
+          <div className="my-6 rounded-lg border border-border bg-sand p-4">
             <p className="text-sm font-medium">{state}</p>
             <p className="muted mt-2 text-sm leading-6">
               Cookie login akan dibersihkan tanpa mengubah akun atau password

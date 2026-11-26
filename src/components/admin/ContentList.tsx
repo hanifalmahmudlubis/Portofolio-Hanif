@@ -36,10 +36,7 @@ export default function ContentList({
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <label className="relative w-full max-w-sm">
-          <Search
-            size={15}
-            className="absolute left-3 top-3.5 text-[#8997ae]"
-          />
+          <Search size={15} className="absolute left-3 top-3.5 text-mute" />
           <input
             aria-label="Cari konten"
             className="input !pl-10"
@@ -61,7 +58,7 @@ export default function ContentList({
           </select>
         )}
       </div>
-      <div className="overflow-x-auto rounded-xl border border-[#212a39]">
+      <div className="overflow-x-auto rounded-xl border border-line">
         <table className="admin-table min-w-[680px]">
           <thead>
             <tr>
@@ -77,18 +74,18 @@ export default function ContentList({
                 <td>
                   <Link
                     href={`/admin/${kind}/${item.id}`}
-                    className="font-medium hover:text-[#91a6df]"
+                    className="font-medium hover:text-brand"
                   >
                     {item.title}
                   </Link>
                   <p className="muted mt-2 text-[13px]">
                     {item.subtitle}
                     {item.featured && (
-                      <span className="ml-2 text-[#91a6df]">· Unggulan</span>
+                      <span className="ml-2 text-brand">· Unggulan</span>
                     )}
                   </p>
                 </td>
-                <td className="whitespace-nowrap font-mono text-xs text-[#b0b9c9]">
+                <td className="whitespace-nowrap font-mono text-xs text-ink-soft">
                   {item.meta}
                 </td>
                 {kind === "projects" && (
@@ -135,7 +132,7 @@ export default function ContentList({
         </table>
         {!visible.length && (
           <div className="p-12 text-center">
-            <FolderOpen className="mx-auto mb-4 text-[#8794ac]" size={30} />
+            <FolderOpen className="mx-auto mb-4 text-mute" size={30} />
             <p className="muted text-sm">
               {query || filter !== "all"
                 ? "Tidak ada hasil yang cocok."
@@ -143,7 +140,7 @@ export default function ContentList({
             </p>
             {(query || filter !== "all") && (
               <button
-                className="mt-4 text-xs text-[#91a6df]"
+                className="mt-4 text-xs text-brand"
                 onClick={() => {
                   setQuery("");
                   setFilter("all");

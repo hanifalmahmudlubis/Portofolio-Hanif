@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Project } from "@/types/project";
-import { imageUrl } from "@/lib/urls";
+import { initials, projectCover } from "@/lib/project-cover";
 import Reveal from "../ui/Reveal";
+import BrowserFrame from "./BrowserFrame";
 export default function ProjectCard({
   project,
   index = 0,
@@ -11,28 +11,24 @@ export default function ProjectCard({
   project: Project;
   index?: number;
 }) {
-  const cover = imageUrl(
-    project.images.find((image) => image.isThumbnail)?.imageUrl ??
-      project.images[0]?.imageUrl,
-  );
+  const cover = projectCover(project);
   return (
-    <Reveal delay={(index % 2) * 0.06} from="up" className="project-reveal">
+    <Reveal delay={(index % 2) * 0.08} from="up" className="project-reveal">
       <article className={`project-card ${cover ? "has-cover" : ""}`}>
-        {cover && (
-          <Link
-            href={`/projects/${project.slug}`}
-            aria-label={`Preview ${project.title}`}
-            className="project-visual"
-          >
-            <Image
-              src={cover}
-              alt={project.title}
-              fill
-              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 410px"
-              className="object-cover"
-            />
-          </Link>
-        )}
+        <Link
+          href={`/projects/${project.slug}`}
+          aria-label={`Preview ${project.title}`}
+          className="project-visual"
+          tabIndex={-1}
+        >
+          <BrowserFrame
+            src={cover}
+            alt={project.title}
+            url={`/projects/${project.slug}`}
+            sizes="(max-width: 767px) 100vw, 600px"
+            fallback={initials(project.title)}
+          />
+        </Link>
         <div className="project-card-content">
           <div className="project-meta">
             <span className="project-category">{project.category}</span>
@@ -57,9 +53,7 @@ export default function ProjectCard({
             </div>
           )}
           <div className="project-card-footer">
-            <span className="text-xs text-[#94a3bd]">
-              {project.projectType}
-            </span>
+            <span>{project.projectType}</span>
             <Link href={`/projects/${project.slug}`} className="project-open">
               View project <ArrowUpRight size={15} aria-hidden="true" />
             </Link>
