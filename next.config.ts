@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   turbopack: { root: process.cwd() },
+  experimental: { agentUpgrade: "security" },
   // Admin uploads may use local or external image URLs.
   images: { unoptimized: true },
   async rewrites() {
